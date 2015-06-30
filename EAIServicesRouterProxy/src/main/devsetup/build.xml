@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<project name="setup-local-dev" default="build" basedir=".">
+    <property environment="env"/>     
+    
+    <!--Global EAI tasks-->    
+    <import file="${env.EAI_FIXTURES_DIR}/EAI-tasks.xml" />
+
+	<target name="copy-config" description="Cleans out any existing configuration and copies in what we need.">
+        <delete>
+            <fileset dir="${resource.dir}" includes="*.properties"/>
+        </delete>
+        <copy file="${conf.dir}/eai-services-router-proxy-JasyptPasswordEncryption.xml" tofile="${resource.dir}/eai-services-router-proxy-JasyptPasswordEncryption.xml"/>  
+        <copy file="${conf.dir}/eai-services-ports-mule-02.properties" tofile="${resource.dir}/eai-services-ports.properties"/>                
+        <copy file="${conf.dir}/eai-secure-connection-local.properties" tofile="${resource.dir}/eai-secure-connection.properties"/>
+        <copy file="${conf.dir}/eai-services-uri.properties" tofile="${resource.dir}/eai-services-uri.properties"/>
+        <copy file="${conf.dir}/log4j.xml" tofile="${resource.dir}/log4j.xml"/>                        
+    </target>
+    
+    <target name="build" description="Compiles the default Maven lifecycle">
+        <antcall target="env-check-mule-encryption"/>
+        <antcall target="copy-config"/>
+        <antcall target="build-info"/>                                
+        <antcall target="parent-pom"/> 
+        <antcall target="eai-build"/>                 
+    </target>
+        
+    <target name="help" description="Launches wiki page for this flow">
+        <exec dir="." executable="cmd.exe">
+            <arg value="/c"/>
+            <arg value="start http://cawiki.ca.com/display/EAITeam/dbdirect+dev-setup"/>
+        </exec>        
+    </target>
+    
+    <target name="url" description="Launches the flow target url in the local browser">
+        <exec dir="." executable="cmd.exe">
+            <arg value="/c"/>
+            <arg value="start http://localhost:8088/services-router-proxy/config-info"/>
+        </exec>        
+    </target>
+    
+
+</project>

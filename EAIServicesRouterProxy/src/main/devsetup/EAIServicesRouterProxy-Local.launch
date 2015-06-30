@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.mule.tooling.runtime.muleServerLaunchType">
+<stringAttribute key="clear_data" value="NEVER"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="eai-services-router-proxy"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-XX:PermSize=128M -XX:MaxPermSize=256M -Dhttp.listenHost=localhost -Dhttp.listenPort=8088 -Dhttps.listenPort=8089 -Djvm-parameters.port=8090 -Dhttps-healthcheck.port=8091 -Dhttp-healthcheck.port=8092 -Dmule.log.dir=. -Dmule.instance=mule-01"/>
+<intAttribute key="remote-debug-port" value="6666"/>
+</launchConfiguration>

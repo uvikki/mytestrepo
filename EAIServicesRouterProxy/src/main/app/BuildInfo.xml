@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:core="http://www.mulesoft.org/schema/mule/core" version="CE-3.3.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd 
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd ">
+    <flow name="BuildInfo" doc:name="BuildInfo">
+        <http:inbound-endpoint exchange-pattern="request-response" 
+            host="${http.listenHost}"
+            port="${http.listenPort}"
+            path="${eai-services-router-proxy-1.0.root.uri}/build-info"
+        	encoding="UTF-8" mimeType="text/plain" doc:name="HTTP" doc:description="Handle build-info request"/>
+        <custom-transformer class="com.ca.eai.esb.transformer.BuildInfo" doc:name="Load Build" doc:description="Load Build Info"/>
+    </flow>
+</mule>

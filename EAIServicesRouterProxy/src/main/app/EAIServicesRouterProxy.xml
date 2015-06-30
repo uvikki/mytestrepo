@@ -1,0 +1,1445 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+xmlns:file="http://www.mulesoft.org/schema/mule/file"
+    
+xmlns:tcp="http://www.mulesoft.org/schema/mule/tcp"
+    
+    xmlns:https="http://www.mulesoft.org/schema/mule/https"
+    xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+    xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:http="http://www.mulesoft.org/schema/mule/http"
+    xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:pattern="http://www.mulesoft.org/schema/mule/pattern"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd 
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd 
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd 
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd 
+http://www.mulesoft.org/schema/mule/pattern http://www.mulesoft.org/schema/mule/pattern/current/mule-pattern.xsd ">
+
+    <spring:beans>
+        <spring:import resource="classpath:eai-services-router-proxy-JasyptPasswordEncryption.xml" />
+    </spring:beans>
+
+    <!--  -->
+    <custom-transformer
+        class="com.ca.eai.esb.transformer.IncomingRequestPropertyTransformer"
+        name="incoming-request-property-transformer"
+        doc:name="Java"
+        ignoreBadInput="true" />
+
+    <!--
+        ************************************
+        *                                  *
+        *                                  *
+        * HTTPS Connector setup            *
+        *                                  *
+        *                                  *
+        ************************************
+    -->
+    <https:connector
+        name="EAI_HTTPS_Connector"
+        cookieSpec="netscape"
+        validateConnections="true"
+        sendBufferSize="0"
+        receiveBufferSize="0"
+        receiveBacklog="0"
+        clientSoTimeout="${clientSoTimeout}"
+        serverSoTimeout="${serverSoTimeout}"
+        socketSoLinger="${socketSoLinger}"
+        doc:name="HTTP\HTTPS" >
+        <receiver-threading-profile 
+        	maxThreadsActive="${threads.https.maxThreadsActive}" />
+        <https:tls-key-store
+            path="/opt/eai/common/keystore/EAIKeystore.jks"
+            storePassword="${store.password}"
+            keyPassword="${key.password}" />
+        <https:tls-server
+            path="/opt/eai/common/keystore/CACerts.jks"
+            storePassword="${store.password}" />
+    </https:connector>
+
+    <!--
+        ************************************
+        *                                  *
+        *                                  *
+        * HTTP Connector setup             *
+        *                                  *
+        *                                  *
+        ************************************
+    -->
+    <http:connector
+        name="EAI_HTTP_Connector"
+        cookieSpec="netscape"
+        validateConnections="true"
+        sendBufferSize="0"
+        receiveBufferSize="0"
+        receiveBacklog="0"
+        clientSoTimeout="${clientSoTimeout}"
+        serverSoTimeout="${serverSoTimeout}"
+        socketSoLinger="${socketSoLinger}"
+        doc:name="HTTP\HTTPS" >
+        <receiver-threading-profile 
+        	maxThreadsActive="${threads.http.maxThreadsActive}" />
+    </http:connector>
+
+    <!--
+        ************************************
+        *                                  *
+        *                                  *
+        * Start: Healthcheck Service(s)    *
+        *                                  *
+        *                                  *
+        ************************************
+    -->
+
+    <!-- Http Healthcheck Service -->
+    <pattern:http-proxy
+        name="HttpHealthcheckService"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="http://${http.listenHost}:${http.listenPort}/${http-healthcheck.root.uri}"
+        outboundEndpoint-ref="HttpHealthcheckService-outbound-endpoint" />
+
+    <!-- HttpHealthcheckService-outbound-endpoint -->
+    <http:endpoint
+        name="HttpHealthcheckService-outbound-endpoint" 
+        address="http://${http.listenHost}:${http-healthcheck.port}/${http-healthcheck.root.uri}"
+        responseTimeout="${outbound.response.timeout}"
+        connector-ref="EAI_HTTP_Connector" />
+    
+    <!-- Https Healthcheck Service -->
+    <pattern:http-proxy
+        name="HttpsHealthcheckService"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${https-healthcheck.root.uri}"
+        outboundEndpoint-ref="HttpsHealthcheckService-outbound-endpoint" />
+
+    <!-- HttpsHealthcheckService-outbound-endpoint -->
+    <https:endpoint
+        name="HttpsHealthcheckService-outbound-endpoint"
+        address="https://${http.listenHost}:${https-healthcheck.https.port}/${https-healthcheck.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+    
+    <!--
+        ************************************
+        *                                  *
+        *                                  *
+        * End: Healthcheck Service(s)      *
+        *                                  *
+        *                                  *
+        ************************************
+    -->
+
+    <!--
+        ************************************
+        *                                  *
+        *                                  *
+        * Start: House Keeping Services(s) *
+        *                                  *
+        *                                  *
+        ************************************
+    -->
+
+    <!-- JVM Parameters Service -->
+    <pattern:http-proxy
+        name="JVMParametersService"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="http://${http.listenHost}:${http.listenPort}/${jvm-parameters.root.uri}"
+        outboundEndpoint-ref="JVMParametersService-outbound-endpoint" />
+
+    <!-- JVMParametersService-outbound-endpoint -->
+    <http:endpoint
+        name="JVMParametersService-outbound-endpoint"
+        address="http://${http.listenHost}:${jvm-parameters.port}/${jvm-parameters.root.uri}"
+        responseTimeout="${outbound.response.timeout}"
+        connector-ref="EAI_HTTP_Connector" />
+    
+    <!--
+        ************************************
+        *                                  *
+        *                                  *
+        * End: House Keeping Services(s)   *
+        *                                  *
+        *                                  *
+        ************************************
+    -->
+
+    <!--
+        ************************************
+        *                                  *
+        *                                  *
+        * Start: HTTP services             *
+        *                                  *
+        *                                  *
+        ************************************
+    -->
+
+    <!-- AccountReadByID Service - developed as a part of Nimsoft project -->
+    <pattern:http-proxy
+        name="AccountReadByID-2.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="http://${http.listenHost}:${http.listenPort}/${account-read-by-id-2.0.root.uri}"
+        outboundEndpoint-ref="AccountReadByID-2.0-outbound-endpoint" />
+
+    <!-- AccountReadByID-2.0-outbound-endpoint -->
+    <http:endpoint
+        name="AccountReadByID-2.0-outbound-endpoint"
+        address="http://${http.listenHost}:${account-read-by-id-2.0.port}/${account-read-by-id-2.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}"
+        connector-ref="EAI_HTTP_Connector" />
+    
+    <!-- OpportunityAccountReadByOpportuntiyId Service - developed as a part of Nimsoft project -->
+    <pattern:http-proxy
+        name="OpportunityAccountReadByOpportuntiyId-2.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="http://${http.listenHost}:${http.listenPort}/${opportunity-account-read-by-opportuntiy-id-2.0.root.uri}"
+        outboundEndpoint-ref="OpportunityAccountReadByOpportuntiyId-2.0-outbound-endpoint" />
+
+    <!-- OpportunityAccountReadByOpportuntiyId-2.0-outbound-endpoint -->
+    <http:endpoint
+        name="OpportunityAccountReadByOpportuntiyId-2.0-outbound-endpoint"
+        address="http://${http.listenHost}:${opportunity-account-read-by-opportuntiy-id-2.0.port}/${opportunity-account-read-by-opportuntiy-id-2.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}"
+        connector-ref="EAI_HTTP_Connector" />
+    
+    <!-- OpportunityReadByID Service - developed as a part of Nimsoft project -->
+    <pattern:http-proxy
+        name="OpportunityReadByID-2.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="http://${http.listenHost}:${http.listenPort}/${opportunity-read-by-id-2.0.root.uri}"
+        outboundEndpoint-ref="OpportunityReadByID-2.0-outbound-endpoint" />
+
+    <!-- OpportunityReadByID-2.0-outbound-endpoint -->
+    <http:endpoint
+        name="OpportunityReadByID-2.0-outbound-endpoint"
+        address="http://${http.listenHost}:${opportunity-read-by-id-2.0.port}/${opportunity-read-by-id-2.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}"
+        connector-ref="EAI_HTTP_Connector" />
+    
+    <!-- QuoteSubmitForUpsert Service - developed as a part of Nimsoft project -->
+    <pattern:http-proxy
+        name="QuoteSubmitForUpsert-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="http://${http.listenHost}:${http.listenPort}/${quote-submit-for-upsert-1.0.root.uri}"
+        outboundEndpoint-ref="QuoteSubmitForUpsert-1.0-outbound-endpoint" />
+
+    <!-- QuoteSubmitForUpsert-1.0-outbound-endpoint -->
+    <http:endpoint
+        name="QuoteSubmitForUpsert-1.0-outbound-endpoint"
+        address="http://${http.listenHost}:${quote-submit-for-upsert-1.0.port}/${quote-submit-for-upsert-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}"
+        connector-ref="EAI_HTTP_Connector" />
+    
+    <!-- User Authentication Service (ActiveDirectory LDAP search) - developed as a part of common services -->
+    <pattern:http-proxy
+        name="UserAuthentication-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="http://${http.listenHost}:${http.listenPort}/${user-authentication-1.0.root.uri}"
+        outboundEndpoint-ref="UserAuthentication-1.0-outbound-endpoint" />
+
+    <!-- UserAuthentication-1.0-outbound-endpoint -->
+    <http:endpoint
+        name="UserAuthentication-1.0-outbound-endpoint"
+        address="http://${http.listenHost}:${user-authentication-1.0.port}/${user-authentication-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}"
+        connector-ref="EAI_HTTP_Connector" />
+    
+    <!-- Sanction Party List Check Service - developed as a part of common services -->
+    <pattern:http-proxy
+        name="SPL-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="http://${http.listenHost}:${http.listenPort}/${splservice-1.0.root.uri}"
+        outboundEndpoint-ref="SPL-1.0-outbound-endpoint" />
+
+    <!-- SPL-1.0-outbound-endpoint -->
+    <http:endpoint
+        name="SPL-1.0-outbound-endpoint"
+        address="http://${http.listenHost}:${splservice-1.0.port}/${splservice-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}"
+        connector-ref="EAI_HTTP_Connector" />
+    
+
+    <!-- HTTP ESB Template 1.0 -->
+    <pattern:http-proxy
+        name="HttpEsbTemplate-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="http://${http.listenHost}:${http.listenPort}/${esb-templates-1.0.root.uri}"
+        outboundEndpoint-ref="HttpEsbTemplate-1.0-outbound-endpoint" />
+
+    <!-- HttpEsbTemplate-1.0-outbound-endpoint -->
+    <http:endpoint
+        name="HttpEsbTemplate-1.0-outbound-endpoint"
+        address="http://${http.listenHost}:${esb-templates-1.0.port}/${esb-templates-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}"
+        connector-ref="EAI_HTTP_Connector" />
+    
+    
+    <!-- Quote-Upsert -->
+    <pattern:http-proxy
+        name="QuoteUpsert-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="http://${http.listenHost}:${http.listenPort}/${quote-upsert-1.0.root.uri}"
+        outboundEndpoint-ref="QuoteUpsert-1.0-outbound-endpoint" />
+
+    <!-- Quote-Upsert-1.0-outbound-endpoint -->
+    <http:endpoint
+        name="QuoteUpsert-1.0-outbound-endpoint"
+        address="http://${http.listenHost}:${quote-upsert-1.0.port}/${quote-upsert-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}"
+        connector-ref="EAI_HTTP_Connector" />
+      
+      
+    <!-- SPLServiceSOAP --> 
+    <pattern:http-proxy
+        name="SPLServiceSOAP-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="http://${http.listenHost}:${http.listenPort}/${splsoap-1.0.root.uri}"
+        outboundEndpoint-ref="SPLServiceSOAP-1.0-outbound-endpoint" />
+       
+    <!-- SPLServiceSOAP-1.0-outbound-endpoint --> 
+    <http:endpoint
+        name="SPLServiceSOAP-1.0-outbound-endpoint"
+        address="http://${http.listenHost}:${splsoap-1.0.http.port}/${splsoap-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}"
+        connector-ref="EAI_HTTP_Connector" />
+      
+    <!-- Service Cloud Traffic Cop --> 
+    <pattern:http-proxy
+        name="ServiceCloudTrafficCop-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="http://${http.listenHost}:${http.listenPort}/${service-cloud-traffic-cop-1.0.root.uri}"
+        outboundEndpoint-ref="ServiceCloudTrafficCop-1.0-outbound-endpoint" />
+       
+    <!-- ServiceCloudTrafficCop-1.0-outbound-endpoint --> 
+    <http:endpoint
+        name="ServiceCloudTrafficCop-1.0-outbound-endpoint"
+        address="http://${http.listenHost}:${service-cloud-traffic-cop-1.0.http.port}/${service-cloud-traffic-cop-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}"
+        connector-ref="EAI_HTTP_Connector" />
+   
+    <!--
+        ************************************
+        *                                  *
+        *                                  *
+        * End: HTTP services               *
+        *                                  *
+        *                                  *
+        ************************************
+    -->
+
+    <!--
+        ************************************
+        *                                  *
+        *                                  *
+        * Start: HTTPS services            *
+        *                                  *
+        *                                  *
+        ************************************
+    -->
+
+    <!-- QuoteStatusUpdate Service - developed as a part of Nimsoft project -->
+    <pattern:http-proxy
+        name="QuoteStatusUpdate-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${quote-status-update-1.0.root.uri}"
+        outboundEndpoint-ref="QuoteStatusUpdate-1.0-outbound-endpoint" />
+
+    <!-- QuoteStatusUpdate-1.0-outbound-endpoint -->
+    <https:endpoint
+        name="QuoteStatusUpdate-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${quote-status-update-1.0.https.port}/${quote-status-update-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+    
+    <!-- Dun & Bradstreet 2.0 (DBDirect) Service - developed as a part of D&B project -->
+    <pattern:http-proxy
+        name="DBDirect-2.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${dbdirect-2.0.root.uri}"
+        outboundEndpoint-ref="DBDirect-2.0-outbound-endpoint" />
+
+    <!-- DBDirect-2.0-outbound-endpoint -->
+    <https:endpoint
+        name="DBDirect-2.0-outbound-endpoint"
+        address="https://${http.listenHost}:${dbdirect-2.0.https.port}/${dbdirect-2.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+    <!-- Dun & Bradstreet 2.0 (DBDirect) Admin Service - developed as a part of D&B project -->
+    <pattern:http-proxy
+        name="DBDirect-Admin-2.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${dbdirect-2.0.admin.root.uri}"
+        outboundEndpoint-ref="DBDirect-2.0-outbound-endpoint" />
+
+    <!-- DBDirect-Admin-2.0-outbound-endpoint -->
+    <https:endpoint
+        name="DBDirect-Admin-2.0-outbound-endpoint"
+        address="https://${http.listenHost}:${dbdirect-2.0.admin.https.port}/${dbdirect-2.0.admin.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+    <!-- HTTPS ESB Template 1.0 -->
+    <pattern:http-proxy
+        name="HttpsEsbTemplate-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${esb-templates-1.0.root.uri}"
+        outboundEndpoint-ref="HttpsEsbTemplate-1.0-outbound-endpoint" />
+
+    <!-- HttpEsbTemplate-1.0-outbound-endpoint -->
+    <https:endpoint
+        name="HttpsEsbTemplate-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${esb-templates-1.0.https.port}/${esb-templates-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+            
+    <!-- License Service -->
+    <pattern:http-proxy
+        name="License-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${license-1.0.root.uri}"
+        outboundEndpoint-ref="License-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="License-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${license-1.0.https.port}/${license-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+        
+    <!-- Site Service -->
+    <pattern:http-proxy
+        name="Site-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${site-1.0.root.uri}"
+        outboundEndpoint-ref="Site-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="Site-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${site-1.0.https.port}/${site-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+ 
+     <pattern:http-proxy
+        name="Site-2.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${site-2.0.root.uri}"
+        outboundEndpoint-ref="Site-2.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="Site-2.0-outbound-endpoint"
+        address="https://${http.listenHost}:${site-2.0.https.port}/${site-2.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+        
+    <!-- HR Feed -->
+    <pattern:http-proxy
+        name="HRFeed-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${hr-feed-1.0.root.uri}"
+        outboundEndpoint-ref="HRFeed-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="HRFeed-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${hr-feed-1.0.https.port}/${hr-feed-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+    <!-- POC-Request Service -->
+    <pattern:http-proxy
+        name="PocRequest-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${poc-request-1.0.root.uri}"
+        outboundEndpoint-ref="PocRequest-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="PocRequest-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${poc-request-1.0.https.port}/${poc-request-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+    <!-- Manifest Service -->
+    <pattern:http-proxy
+        name="Manifest-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${manifest-1.0.root.uri}"
+        outboundEndpoint-ref="Manifest-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="Manifest-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${manifest-1.0.https.port}/${manifest-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+ 
+    <!-- Entitlement Service -->
+<!--     <pattern:http-proxy -->
+<!--         name="Entitlement-1.0" -->
+<!--         transformer-refs="incoming-request-property-transformer" -->
+<!--         inboundAddress="https://${http.listenHost}:${https.listenPort}/${entitlement-1.0.root.uri}" -->
+<!--         outboundEndpoint-ref="Entitlement-1.0-outbound-endpoint" /> -->
+
+<!--     <https:endpoint -->
+<!--         name="Entitlement-1.0-outbound-endpoint" -->
+<!--         address="https://${http.listenHost}:${entitlement-1.0.https.port}/${entitlement-1.0.root.uri}" -->
+<!--         responseTimeout="${outbound.response.timeout}"  -->
+<!--         connector-ref="EAI_HTTPS_Connector" />  -->
+
+    <!-- Order Orchestration Service -->
+    <pattern:http-proxy
+        name="Order-Orchestration-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${order-orchestration-1.0.root.uri}"
+        outboundEndpoint-ref="Order-Orchestration-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="Order-Orchestration-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${order-orchestration-1.0.https.port}/${order-orchestration-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" /> 
+        
+    <!-- SPL-HTTPS Service -->
+    <pattern:http-proxy
+        name="Spl-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${spl-1.0.root.uri}"
+        outboundEndpoint-ref="Spl-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="Spl-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${spl-1.0.https.port}/${spl-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+    <!-- RnD Validate Problem Solution - HTTPS Service -->
+    <pattern:http-proxy
+        name="rnd-validate-prbsol-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${rnd-validate-prbsol-1.0.root.uri}"
+        outboundEndpoint-ref="rnd-validate-prbsol-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="rnd-validate-prbsol-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${rnd-validate-prbsol-1.0.https.port}/${rnd-validate-prbsol-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+        
+        
+    <!-- Project Submit For Upsert- HTTPS Service -->
+    <pattern:http-proxy
+        name="project-submit-for-upsert-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${project-submit-for-upsert-1.0.root.uri}"
+        outboundEndpoint-ref="project-submit-for-upsert-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="project-submit-for-upsert-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${project-submit-for-upsert-1.0.https.port}/${project-submit-for-upsert-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+    <!-- Project Upsert- HTTPS Service -->
+    <pattern:http-proxy
+        name="project-upsert-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${project-upsert-1.0.root.uri}"
+        outboundEndpoint-ref="project-upsert-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="project-upsert-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${project-upsert-1.0.https.port}/${project-upsert-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+    <!-- Notification Service -->
+    <pattern:http-proxy
+        name="Notification"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${notification.root.uri}"
+        outboundEndpoint-ref="Notification-outbound-endpoint" />
+
+    <https:endpoint
+        name="Notification-outbound-endpoint"
+        address="https://${http.listenHost}:${notification-2.0.https.port}/${notification.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+    <!-- Order Service -->
+    <pattern:http-proxy
+        name="Order-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${order-1.0.root.uri}"
+        outboundEndpoint-ref="Order-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="Order-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${order-1.0.https.port}/${order-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+        
+    <!-- Case Create Update- HTTPS Service -->
+    <pattern:http-proxy
+        name="Case-create-update-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${case-create-update-1.0.root.uri}"
+        outboundEndpoint-ref="Case-create-update-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="Case-create-update-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${case-create-update-1.0.https.port}/${case-create-update-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+    <!-- MDM Account - HTTPS Service -->
+    <pattern:http-proxy
+        name="MDMAccount"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${mdm-accounts-1.0.root.uri}"
+        outboundEndpoint-ref="MDMAccount-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="MDMAccount-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${mdm-accounts-1.0.https.port}/${mdm-accounts-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+    <!-- ISTP Account Search - HTTPS Service -->
+    <pattern:http-proxy
+        name="AccountSearch"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${account-search-1.0.root.uri}"
+        outboundEndpoint-ref="AccountSearch-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="AccountSearch-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${account-search-1.0.https.port}/${account-search-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+    <!-- MDM Account - HTTPS Service -->
+    <pattern:http-proxy
+        name="AccountSubmitForUpsert"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${account-submit-for-upsert-1.0.root.uri}"
+        outboundEndpoint-ref="AccountSubmitForUpsert-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="AccountSubmitForUpsert-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${account-submit-for-upsert-1.0.https.port}/${account-submit-for-upsert-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+    <!-- HR Org Chart Feed - HTTPS Service -->
+    <pattern:http-proxy
+        name="hr-org-chart-feed-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${hr-org-chart-feed-1.0.root.uri}"
+        outboundEndpoint-ref="hr-org-chart-feed-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="hr-org-chart-feed-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${hr-org-chart-feed-1.0.https.port}/${hr-org-chart-feed-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+    <!--Case Activity- Service Cloud Project - HTTPS Service -->
+    <pattern:http-proxy
+        name="Case-activity-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${case-activity-1.0.root.uri}"
+        outboundEndpoint-ref="Case-activity-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="Case-activity-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${case-activity-1.0.https.port}/${case-activity-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+    <!--Attachment Metadata CRUD- Service Cloud Project - HTTPS Service -->
+    <pattern:http-proxy
+        name="Attachment-meta-data-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${attachment-meta-data-1.0.root.uri}"
+        outboundEndpoint-ref="Attachment-meta-data-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="Attachment-meta-data-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${attachment-meta-data-1.0.https.port}/${attachment-meta-data-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+    <!--Attachment Notification- Service Cloud Project - HTTPS Service -->
+    <pattern:http-proxy
+        name="Attachment-notification-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${attachment-notification-1.0.root.uri}"
+        outboundEndpoint-ref="Attachment-notification-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="Attachment-notification-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${attachment-notification-1.0.https.port}/${attachment-notification-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+    <!--Territory Hiearchcy - Data Enrichment Project - HTTPS Service -->
+    <pattern:http-proxy
+        name="Territory-Hiearchcy-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${territory-hierarchy-1.0.root.uri}"
+        outboundEndpoint-ref="Territory-Hiearchcy-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="Territory-Hiearchcy-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${territory-hierarchy-1.0.https.port}/${territory-hierarchy-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+    <!-- Employee Service -->
+    <pattern:http-proxy
+        name="Employee-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${employee-1.0.root.uri}"
+        outboundEndpoint-ref="Employee-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="Employee-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${employee-1.0.https.port}/${employee-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+  <!-- Employee Job Service --> 
+    <pattern:http-proxy
+        name="EmployeeJob-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${employee-jobs-1.0.root.uri}"
+        outboundEndpoint-ref="Employee-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="EmployeeJob-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${employee-1.0.https.port}/${employee-jobs-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+    <!--Case Survey - Service Cloud Project - HTTPS Service -->
+    <pattern:http-proxy
+        name="Case-Survey-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${case-survey-1.0.root.uri}"
+        outboundEndpoint-ref="Case-Survey-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="Case-Survey-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${case-survey-1.0.https.port}/${case-survey-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+    <!--Retrieve Case Details - Service Cloud Project - HTTPS Service -->
+    <pattern:http-proxy
+        name="Retrieve-Case-Details-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${retrieve-case-details-1.0.root.uri}"
+        outboundEndpoint-ref="Retrieve-Case-Details-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="Retrieve-Case-Details-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${retrieve-case-details-1.0.https.port}/${retrieve-case-details-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+    <!--site-association - HTTPS Service -->
+    <pattern:http-proxy
+        name="site-association-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${site-association-1.0.root.uri}"
+        outboundEndpoint-ref="site-association-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="site-association-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${site-association-1.0.https.port}/${site-association-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+    <!--Contact submit for upsert - HTTPS Service -->
+    <pattern:http-proxy
+        name="contact-submit-for-upsert-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${contact-submit-for-upsert-1.0.root.uri}"
+        outboundEndpoint-ref="contact-submit-for-upsert-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="contact-submit-for-upsert-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${contact-submit-for-upsert-1.0.https.port}/${contact-submit-for-upsert-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+    <!-- Logo Service -->
+    <pattern:http-proxy
+        name="Logo-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${logo-1.0.root.uri}"
+        outboundEndpoint-ref="Logo-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="Logo-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${logo-1.0.https.port}/${logo-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+    <!-- SFDC Select Service -->
+    <pattern:http-proxy
+        name="Sfdc-Select-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${sfdc-select-1.0.root.uri}"
+        outboundEndpoint-ref="Sfdc-Select-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="Sfdc-Select-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${sfdc-select-1.0.https.port}/${sfdc-select-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+    <!-- Case Search - Service Cloud Project - HTTPS Service -->
+    <pattern:http-proxy
+        name="Case-Search-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${case-search-1.0.root.uri}"
+        outboundEndpoint-ref="Case-Search-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="Case-Search-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${case-search-1.0.https.port}/${case-search-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+    <!-- Logo Job Service -->
+    <pattern:http-proxy
+        name="Logo-Job-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${logo-job-1.0.root.uri}"
+        outboundEndpoint-ref="Logo-Job-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="Logo-Job-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${logo-job-1.0.https.port}/${logo-job-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+    <!--Email To Case - Service Cloud Project - HTTPS Service -->
+    <pattern:http-proxy
+        name="Email-To-Case-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${email-to-case-1.0.root.uri}"
+        outboundEndpoint-ref="Email-To-Case-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="Email-To-Case-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${email-to-case-1.0.https.port}/${email-to-case-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+    <!--Email To Case Poller - Service Cloud Project - HTTPS Service -->
+    <pattern:http-proxy
+        name="Email-To-Case-Poller-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${email-to-case-poller-1.0.root.uri}"
+        outboundEndpoint-ref="Email-To-Case-Poller-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="Email-To-Case-Poller-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${email-to-case-poller-1.0.https.port}/${email-to-case-poller-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+    <!-- Country Service -->
+    <pattern:http-proxy
+        name="Company-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${country-1.0.root.uri}"
+        outboundEndpoint-ref="Country-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="Country-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${country-1.0.https.port}/${country-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+        
+    <!-- MDM-IPASign-1.0 Service - developed as a part of MDM CSO project -->
+    <pattern:http-proxy
+        name="MDM-IPASign-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${mdm-ipasign-1.0.root.uri}"
+        outboundEndpoint-ref="MDM-IPASign-1.0-outbound-endpoint" />
+
+    <!-- MDM-IPASign-1.0-outbound-endpoint -->
+    <https:endpoint
+        name="MDM-IPASign-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${mdm-ipasign-1.0.https.port}/${mdm-ipasign-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+        
+    <!-- Log Redirector Service -->
+    <pattern:http-proxy
+        name="Log-Redirector-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${log-redirector-1.0.root.uri}"
+        outboundEndpoint-ref="Log-Redirector-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="Log-Redirector-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${log-redirector-1.0.https.port}/${log-redirector-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+    <!-- Log Parser Service -->
+    <pattern:http-proxy
+        name="Log-Parser-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${log-parser-1.0.root.uri}"
+        outboundEndpoint-ref="Log-Parser-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="Log-Parser-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${log-parser-1.0.https.port}/${log-parser-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+    <!-- Billing Report Service -->
+    <pattern:http-proxy
+        name="Billing-Report-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${billing-report-1.0.root.uri}"
+        outboundEndpoint-ref="Billing-Report-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="Billing-Report-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${billing-report-1.0.https.port}/${billing-report-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+    <!-- Learning Activity Service -->
+    <pattern:http-proxy
+        name="Learning-Activity-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${learning-activity-1.0.root.uri}"
+        outboundEndpoint-ref="Learning-Activity-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="Learning-Activity-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${learning-activity-1.0.https.port}/${learning-activity-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+        
+    <!-- Command Scheduler Service -->
+    <pattern:http-proxy
+        name="Command-Scheduler-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${command-scheduler-1.0.root.uri}"
+        outboundEndpoint-ref="Command-Scheduler-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="Command-Scheduler-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${command-scheduler-1.0.https.port}/${command-scheduler-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />    
+
+    <!-- Service Assessor Service -->
+    <pattern:http-proxy
+        name="service-assessor-1.0-proxy"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${service-assessor-1.0.root.uri}"
+        outboundEndpoint-ref="service-assessor-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="service-assessor-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${service-assessor-1.0.https.port}/${service-assessor-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+        
+    <!-- Order Routing Service -->
+    <pattern:http-proxy
+        name="rule-routing-1.0-proxy"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${rule-routing-1.0.root.uri}"
+        outboundEndpoint-ref="rule-routing-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="rule-routing-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${rule-routing-1.0.https.port}/${rule-routing-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+    <!--Email To Case Batch - Service Cloud Project - HTTPS Service -->
+    <pattern:http-proxy
+        name="Email-To-Case-Batch-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${email-to-case-batch-1.0.root.uri}"
+        outboundEndpoint-ref="Email-To-Case-Batch-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="Email-To-Case-Batch-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${email-to-case-batch-1.0.https.port}/${email-to-case-batch-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+    <!--Email To Case Batch Poller - Service Cloud Project - HTTPS Service -->
+    <pattern:http-proxy
+        name="Email-To-Case-Batch-Poller-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${email-to-case-batch-poller-1.0.root.uri}"
+        outboundEndpoint-ref="Email-To-Case-Batch-Poller-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="Email-To-Case-Batch-Poller-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${email-to-case-batch-poller-1.0.https.port}/${email-to-case-batch-poller-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+    <!-- Case Folder - HTTPS Service -->
+    <pattern:http-proxy
+        name="Case-folder-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${case-folder-1.0.root.uri}"
+        outboundEndpoint-ref="Case-folder-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="Case-folder-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${case-folder-1.0.https.port}/${case-folder-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+    <!-- Case Folder Deletion Job - HTTPS Service -->
+    <pattern:http-proxy
+        name="Case-folder-deletion-job-1.0"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${case-folder-deletion-job-1.0.root.uri}"
+        outboundEndpoint-ref="Case-folder-deletion-job-1.0-outbound-endpoint" />
+
+    <https:endpoint
+        name="Case-folder-deletion-job-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${case-folder-deletion-job-1.0.https.port}/${case-folder-deletion-job-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+        
+    <!-- Support Entitlemnts Service - Https Service -->
+    <pattern:http-proxy
+        name="Support-Entitlements-1.0-proxy"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${support-entitlements-1.0.root.uri}"
+        outboundEndpoint-ref="Support-entitlements-1.0-outbound-endpoint" />
+
+	<https:endpoint
+        name="Support-entitlements-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${support-entitlements-1.0.https.port}/${support-entitlements-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+    
+    <!-- Support contract offerings -Https Service -->    
+    <pattern:http-proxy
+        name="Support-contract-offerings-1.0-proxy"
+        transformer-refs="incoming-request-property-transformer"
+        inboundAddress="https://${http.listenHost}:${https.listenPort}/${support-contract-offerings-1.0.root.uri}"
+        outboundEndpoint-ref="Support-contract-offerings-1.0-outbound-endpoint" />
+
+	<https:endpoint
+        name="Support-contract-offerings-1.0-outbound-endpoint"
+        address="https://${http.listenHost}:${support-contract-offerings-1.0.https.port}/${support-contract-offerings-1.0.root.uri}"
+        responseTimeout="${outbound.response.timeout}" 
+        connector-ref="EAI_HTTPS_Connector" />
+
+
+    <!--
+        ************************************
+        *                                  *
+        *                                  *
+        * End: HTTPS services              *
+        *                                  *
+        *                                  *
+        ************************************
+    -->
+
+    <!--
+        ************************************
+        *                                  *
+        *                                  *
+        * Start: Config Flow               *
+        *                                  *
+        *                                  *
+        ************************************
+    -->
+
+    <flow name="ConfigInfoFlow" doc:name="ConfigInfoFlow">
+        <http:inbound-endpoint
+            exchange-pattern="request-response"
+            host="${http.listenHost}"
+            port="${http.listenPort}"
+            path="${eai-services-router-proxy-1.0.root.uri}/config-info"
+            mimeType="text/plain"
+            encoding="UTF-8"
+            doc:description="Handle request for config" />
+
+        <message-filter
+            doc:name="Filter favicon"
+            doc:description="Drop the favicon browser request">
+            <not-filter>
+                <wildcard-filter
+                    pattern="/favicon.ico"
+                    caseSensitive="false" />
+            </not-filter>
+        </message-filter>
+
+        <custom-transformer
+            class="com.ca.eai.esb.transformer.ProxyConfigurationTransformer"
+            doc:name="Java">
+            
+            <spring:property name="instance" value="${mule.instance}"/>
+            <spring:property
+                name="proxies">
+                <spring:list>
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="HttpHealthcheckService">
+                        <spring:constructor-arg value="http://${http.listenHost}:${http.listenPort}/${http-healthcheck.root.uri}" />
+                        <spring:constructor-arg value="http://${http.listenHost}:${http-healthcheck.port}/${http-healthcheck.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="HttpsHealthcheckService">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${https-healthcheck.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${https-healthcheck.port}/${https-healthcheck.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="JVMParametersService">
+                        <spring:constructor-arg value="http://${http.listenHost}:${http.listenPort}/${jvm-parameters.root.uri}" />
+                        <spring:constructor-arg value="http://${http.listenHost}:${jvm-parameters.port}/${jvm-parameters.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="AccountReadByID-2.0">
+                        <spring:constructor-arg value="http://${http.listenHost}:${http.listenPort}/${account-read-by-id-2.0.root.uri}" />
+                        <spring:constructor-arg value="http://${http.listenHost}:${account-read-by-id-2.0.port}/${account-read-by-id-2.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="OpportunityAccountReadByOpportuntiyId-2.0">
+                        <spring:constructor-arg value="http://${http.listenHost}:${http.listenPort}/${opportunity-account-read-by-opportuntiy-id-2.0.root.uri}" />
+                        <spring:constructor-arg value="http://${http.listenHost}:${opportunity-account-read-by-opportuntiy-id-2.0.port}/${opportunity-account-read-by-opportuntiy-id-2.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="OpportunityReadByID-2.0">
+                        <spring:constructor-arg value="http://${http.listenHost}:${http.listenPort}/${opportunity-read-by-id-2.0.root.uri}" />
+                        <spring:constructor-arg value="http://${http.listenHost}:${opportunity-read-by-id-2.0.port}/${opportunity-read-by-id-2.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="QuoteSubmitForUpsert-1.0">
+                        <spring:constructor-arg value="http://${http.listenHost}:${http.listenPort}/${quote-submit-for-upsert-1.0.root.uri}" />
+                        <spring:constructor-arg value="http://${http.listenHost}:${quote-submit-for-upsert-1.0.port}/${quote-submit-for-upsert-1.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="UserAuthentication-1.0">
+                        <spring:constructor-arg value="http://${http.listenHost}:${http.listenPort}/${user-authentication-1.0.root.uri}" />
+                        <spring:constructor-arg value="http://${http.listenHost}:${user-authentication-1.0.port}/${user-authentication-1.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="QuoteStatusUpdate-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${quote-status-update-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${quote-status-update-1.0.port}/${quote-status-update-1.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="DBDirect-2.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${dbdirect-2.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${dbdirect-2.0.port}/${dbdirect-2.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="SPL-1.0">
+                        <spring:constructor-arg value="http://${http.listenHost}:${http.listenPort}/${splservice-1.0.root.uri}" />
+                        <spring:constructor-arg value="http://${http.listenHost}:${splservice-1.0.port}/${splservice-1.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="HttpEsbTemplate-1.0">
+                        <spring:constructor-arg value="http://${http.listenHost}:${http.listenPort}/${esb-templates-1.0.root.uri}" />
+                        <spring:constructor-arg value="http://${http.listenHost}:${esb-templates-1.0.port}/${esb-templates-1.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="HttpsEsbTemplate-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${esb-templates-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${esb-templates-1.0.https.port}/${esb-templates-1.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="License-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${license-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${license-1.0.https.port}/${license-1.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="Site-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${site-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${site-1.0.https.port}/${site-1.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="Site-2.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${site-2.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${site-2.0.https.port}/${site-2.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="HRFeed-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${hr-feed-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${hr-feed-1.0.https.port}/${hr-feed-1.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="PocRequest-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${poc-request-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${poc-request-1.0.https.port}/${poc-request-1.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="QuoteUpsert-1.0">
+                        <spring:constructor-arg value="http://${http.listenHost}:${http.listenPort}/${quote-upsert-1.0.root.uri}" />
+                        <spring:constructor-arg value="http://${http.listenHost}:${quote-upsert-1.0.port}/${quote-upsert-1.0.root.uri}" />
+                    </spring:bean>
+ 
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="Manifest-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${manifest-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${manifest-1.0.https.port}/${manifest-1.0.root.uri}" />
+                    </spring:bean>
+
+<!--                     <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="Entitlement-1.0"> -->
+<!--                         <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${entitlement-1.0.root.uri}" /> -->
+<!--                         <spring:constructor-arg value="https://${http.listenHost}:${entitlement-1.0.https.port}/${entitlement-1.0.root.uri}" /> -->
+<!--                     </spring:bean> -->
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="Order-Orchestration-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${order-orchestration-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${order-orchestration-1.0.https.port}/${order-orchestration-1.0.root.uri}" />
+                    </spring:bean>
+                    
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="Spl-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${spl-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${spl-1.0.https.port}/${spl-1.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="rnd-validate-prbsol-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${rnd-validate-prbsol-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${rnd-validate-prbsol-1.0.https.port}/${rnd-validate-prbsol-1.0.root.uri}" />
+                    </spring:bean>
+
+                     <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="project-submit-for-upsert-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${project-submit-for-upsert-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${project-submit-for-upsert-1.0.https.port}/${project-submit-for-upsert-1.0.root.uri}" />
+                    </spring:bean>
+ 
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="project-upsert-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${project-upsert-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${project-upsert-1.0.https.port}/${project-upsert-1.0.root.uri}" />
+                    </spring:bean>
+ 
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="Notification">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${notification.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${notification-2.0.https.port}/${notification.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="Order-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${order-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${order-1.0.https.port}/${order-1.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="Case-create-update-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${case-create-update-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${case-create-update-1.0.https.port}/${case-create-update-1.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="MDMAccount-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${mdm-accounts-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${mdm-accounts-1.0.https.port}/${mdm-accounts-1.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="AccountSearch-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${account-search-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${account-search-1.0.https.port}/${account-search-1.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="AccountSubmitForUpsert-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${account-submit-for-upsert-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${account-submit-for-upsert-1.0.https.port}/${account-submit-for-upsert-1.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="hr-org-chart-feed-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${hr-org-chart-feed-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${hr-org-chart-feed-1.0.https.port}/${hr-org-chart-feed-1.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="Case-activity-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${case-activity-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${case-activity-1.0.https.port}/${case-activity-1.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="Attachment-meta-data-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${attachment-meta-data-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${attachment-meta-data-1.0.https.port}/${attachment-meta-data-1.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="Attachment-notification-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${attachment-notification-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${attachment-notification-1.0.https.port}/${attachment-notification-1.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="SPLServiceSOAP-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${splsoap-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${splsoap-1.0.http.port}/${splsoap-1.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="TerritoryHierarchy-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${territory-hierarchy-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${territory-hierarchy-1.0.https.port}/${territory-hierarchy-1.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="Employee-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${employee-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${employee-1.0.https.port}/${employee-1.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="Case-Survey-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${case-survey-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${case-survey-1.0.https.port}/${case-survey-1.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="Retrieve-Case-Details-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${retrieve-case-details-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${retrieve-case-details-1.0.https.port}/${retrieve-case-details-1.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="site-association-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${site-association-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${site-association-1.0.https.port}/${site-association-1.0.root.uri}" />
+                    </spring:bean>
+
+                     <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="contact-submit-for-upsert-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${contact-submit-for-upsert-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${contact-submit-for-upsert-1.0.https.port}/${contact-submit-for-upsert-1.0.root.uri}" />
+                    </spring:bean>
+
+                     <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="service-cloud-traffic-cop-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${http.listenPort}/${service-cloud-traffic-cop-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${service-cloud-traffic-cop-1.0.http.port}/${service-cloud-traffic-cop-1.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="Logo-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${logo-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${logo-1.0.https.port}/${logo-1.0.root.uri}" />
+                    </spring:bean>
+
+                <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="Sfdc-Select-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${sfdc-select-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${sfdc-select-1.0.https.port}/${sfdc-select-1.0.root.uri}" />
+                    </spring:bean>
+
+                      <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="Case-Search-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${case-search-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${case-search-1.0.https.port}/${case-search-1.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="Logo-Job-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${logo-job-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${logo-job-1.0.https.port}/${logo-job-1.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="Email-To-Case-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${email-to-case-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${email-to-case-1.0.https.port}/${email-to-case-1.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="Email-To-Case-Poller-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${email-to-case-poller-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${email-to-case-poller-1.0.https.port}/${email-to-case-poller-1.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="Country-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${country-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${country-1.0.https.port}/${country-1.0.root.uri}" />
+                    </spring:bean>
+                    
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="MDM-IPASign-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${mdm-ipasign-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${mdm-ipasign-1.0.https.port}/${mdm-ipasign-1.0.root.uri}" />
+                    </spring:bean>
+                    
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="Log-Redirector-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${log-redirector-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${log-redirector-1.0.https.port}/${log-redirector-1.0.root.uri}" />
+                    </spring:bean>                    
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="Log-Parser-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${log-parser-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${log-parser-1.0.https.port}/${log-parser-1.0.root.uri}" />
+                    </spring:bean>  
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="Billing-Report-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${billing-report-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${billing-report-1.0.https.port}/${billing-report-1.0.root.uri}" />
+                    </spring:bean>  
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="Learning-Activity-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${learning-activity-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${learning-activity-1.0.https.port}/${learning-activity-1.0.root.uri}" />
+                    </spring:bean>  
+                    
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="Command-Scheduler-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${command-scheduler-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${command-scheduler-1.0.https.port}/${command-scheduler-1.0.root.uri}" />
+                    </spring:bean>                      
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="service-assessor-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${service-assessor-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${service-assessor-1.0.https.port}/${service-assessor-1.0.root.uri}" />
+                    </spring:bean>  
+ 
+                     <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="rule-routing-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${rule-routing-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${rule-routing-1.0.https.port}/${rule-routing-1.0.root.uri}" />
+                    </spring:bean>  
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="Email-To-Case-Batch-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${email-to-case-batch-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${email-to-case-batch-1.0.https.port}/${email-to-case-batch-1.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="Email-To-Case-Batch-Poller-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${email-to-case-batch-poller-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${email-to-case-batch-poller-1.0.https.port}/${email-to-case-batch-poller-1.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="Case-folder-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${case-folder-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${case-folder-1.0.https.port}/${case-folder-1.0.root.uri}" />
+                    </spring:bean>
+
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="Case-folder-deletion-job-1.0">
+                        <spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${case-folder-deletion-job-1.0.root.uri}" />
+                        <spring:constructor-arg value="https://${http.listenHost}:${case-folder-deletion-job-1.0.https.port}/${case-folder-deletion-job-1.0.root.uri}" />
+                    </spring:bean>
+                    
+                    <spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="Support-Entitlements-1.0">
+    					<spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${support-entitlements-1.0.root.uri}" />
+    					<spring:constructor-arg value="https://${http.listenHost}:${support-entitlements-1.0.https.port}/${support-entitlements-1.0.root.uri}" />
+					</spring:bean>
+					
+					<spring:bean class="com.ca.eai.esb.transformer.ServiceProxy" id="Support-contract-offerings-1.0">
+    					<spring:constructor-arg value="https://${http.listenHost}:${https.listenPort}/${support-contract-offerings-1.0.root.uri}" />
+    					<spring:constructor-arg value="https://${http.listenHost}:${support-contract-offerings-1.0.https.port}/${support-contract-offerings-1.0.root.uri}" />
+					</spring:bean> 
+
+                </spring:list>
+            </spring:property>
+        </custom-transformer>
+        <object-to-string-transformer
+            mimeType="text/html"
+            doc:name="Object to String" />
+    </flow>
+
+    <!--
+        ************************************
+        *                                  *
+        *                                  *
+        * End: Config Flow                 *
+        *                                  *
+        *                                  *
+        ************************************
+    -->
+
+</mule>

@@ -1,0 +1,2971 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mule-configuration xmlns="http://www.mulesoft.com/tooling/messageflow" name="EAIServicesRouterProxy">
+    <global-element name="Import" type="http://www.springframework.org/schema/beans/import" entity-id="Import#1">
+        <properties>
+            <property name="resource" value="classpath:eai-services-router-proxy-JasyptPasswordEncryption.xml"/>
+            <property name="auxiliary;wrapIn" value="1"/>
+            <property name="auxiliary;wrappedIn" value="beans@spring@http://www.springframework.org/schema/beans"/>
+            <property name="auxiliary;index" value="2"/>
+        </properties>
+    </global-element>
+    <global-element name="Java" type="http://www.mulesoft.org/schema/mule/core/custom-transformer" entity-id="Java#1">
+        <properties>
+            <property name="returnClass"/>
+            <property name="name" value="incoming-request-property-transformer"/>
+            <property name="mimeType"/>
+            <property name="encoding"/>
+            <property name="class" value="com.ca.eai.esb.transformer.IncomingRequestPropertyTransformer"/>
+            <property name="ignoreBadInput" value="true"/>
+            <property name="auxiliary;index" value="3"/>
+        </properties>
+    </global-element>
+    <global-element name="HTTP\HTTPS" type="org.mule.tooling.ui.modules.core.global.httpsConnector" entity-id="HTTP\HTTPS#1">
+        <properties>
+            <property name="ENABLE_MODE_SWITCH"/>
+            <property name="keepAlive"/>
+            <property name="socketSoLinger" value="${socketSoLinger}"/>
+            <property name="proxyUsername"/>
+            <property name="dispatcherPoolFactory-ref"/>
+            <property name="sendTcpNoDelay"/>
+            <property name="sendBufferSize" value="0"/>
+            <property name="proxyPassword"/>
+            <property name="validateConnections" value="true"/>
+            <property name="label"/>
+            <property name="reuseAddress"/>
+            <property name="cookieSpec" value="netscape"/>
+            <property name="auxiliary;index" value="4"/>
+            <property name="receiveBacklog" value="0"/>
+            <property name="keepSendSocketOpen"/>
+            <property name="proxyPort"/>
+            <property name="dynamicNotification"/>
+            <property name="receiveBufferSize" value="0"/>
+            <property name="enableCookies"/>
+            <property name="serverSoTimeout" value="${serverSoTimeout}"/>
+            <property name="name" value="EAI_HTTPS_Connector"/>
+            <property name="proxyHostname"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/connector"/>
+            <property name="clientSoTimeout" value="${clientSoTimeout}"/>
+            <property-collection name="@http://www.mulesoft.org/schema/mule/https/tls-key-store;0">
+                <property name="storePassword" value="${store.password}"/>
+                <property name="path" value="/opt/eai/common/keystore/EAIKeystore.jks"/>
+                <property name="keyPassword" value="${key.password}"/>
+                <property name="auxiliary;wrapIn" value="6"/>
+                <property name="auxiliary;index" value="6"/>
+            </property-collection>
+            <property-collection name="@http://www.mulesoft.org/schema/mule/https/tls-server;0">
+                <property name="storePassword" value="${store.password}"/>
+                <property name="path" value="/opt/eai/common/keystore/CACerts.jks"/>
+                <property name="auxiliary;wrapIn" value="7"/>
+                <property name="auxiliary;index" value="7"/>
+            </property-collection>
+        </properties>
+    </global-element>
+    <global-element name="HTTP\HTTPS" type="http://www.mulesoft.org/schema/mule/http/connector" entity-id="HTTP\HTTPS#2">
+        <properties>
+            <property name="keepAlive"/>
+            <property name="socketSoLinger" value="${socketSoLinger}"/>
+            <property name="proxyUsername"/>
+            <property name="dispatcherPoolFactory-ref"/>
+            <property name="sendTcpNoDelay"/>
+            <property name="sendBufferSize" value="0"/>
+            <property name="proxyPassword"/>
+            <property name="validateConnections" value="true"/>
+            <property name="label"/>
+            <property name="reuseAddress"/>
+            <property name="cookieSpec" value="netscape"/>
+            <property name="auxiliary;index" value="8"/>
+            <property name="receiveBacklog" value="0"/>
+            <property name="keepSendSocketOpen"/>
+            <property name="proxyPort"/>
+            <property name="dynamicNotification"/>
+            <property name="receiveBufferSize" value="0"/>
+            <property name="enableCookies"/>
+            <property name="serverSoTimeout" value="${serverSoTimeout}"/>
+            <property name="name" value="EAI_HTTP_Connector"/>
+            <property name="proxyHostname"/>
+            <property name="clientSoTimeout" value="${clientSoTimeout}"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="HttpHealthcheckService" index="10" entity-id="global-unknown#1">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;HttpHealthcheckService&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;http://${http.listenHost}:${http.listenPort}/${http-healthcheck.root.uri}&quot; outboundEndpoint-ref=&quot;HttpHealthcheckService-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/http/endpoint" entity-id="HTTP#1">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/http/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTP_Connector"/>
+            <property name="address" value="http://${http.listenHost}:${http-healthcheck.port}/${http-healthcheck.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="11"/>
+            <property name="port"/>
+            <property name="name" value="HttpHealthcheckService-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="HttpsHealthcheckService" index="12" entity-id="global-unknown#2">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;HttpsHealthcheckService&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${https-healthcheck.root.uri}&quot; outboundEndpoint-ref=&quot;HttpsHealthcheckService-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#2">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${https-healthcheck.https.port}/${https-healthcheck.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="13"/>
+            <property name="port"/>
+            <property name="name" value="HttpsHealthcheckService-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="JVMParametersService" index="14" entity-id="global-unknown#3">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;JVMParametersService&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;http://${http.listenHost}:${http.listenPort}/${jvm-parameters.root.uri}&quot; outboundEndpoint-ref=&quot;JVMParametersService-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/http/endpoint" entity-id="HTTP#3">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/http/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTP_Connector"/>
+            <property name="address" value="http://${http.listenHost}:${jvm-parameters.port}/${jvm-parameters.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="15"/>
+            <property name="port"/>
+            <property name="name" value="JVMParametersService-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="AccountReadByID-2.0" index="16" entity-id="global-unknown#4">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;AccountReadByID-2.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;http://${http.listenHost}:${http.listenPort}/${account-read-by-id-2.0.root.uri}&quot; outboundEndpoint-ref=&quot;AccountReadByID-2.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/http/endpoint" entity-id="HTTP#4">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/http/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTP_Connector"/>
+            <property name="address" value="http://${http.listenHost}:${account-read-by-id-2.0.port}/${account-read-by-id-2.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="17"/>
+            <property name="port"/>
+            <property name="name" value="AccountReadByID-2.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="OpportunityAccountReadByOpportuntiyId-2.0" index="18" entity-id="global-unknown#5">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;OpportunityAccountReadByOpportuntiyId-2.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;http://${http.listenHost}:${http.listenPort}/${opportunity-account-read-by-opportuntiy-id-2.0.root.uri}&quot; outboundEndpoint-ref=&quot;OpportunityAccountReadByOpportuntiyId-2.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/http/endpoint" entity-id="HTTP#5">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/http/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTP_Connector"/>
+            <property name="address" value="http://${http.listenHost}:${opportunity-account-read-by-opportuntiy-id-2.0.port}/${opportunity-account-read-by-opportuntiy-id-2.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="19"/>
+            <property name="port"/>
+            <property name="name" value="OpportunityAccountReadByOpportuntiyId-2.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="OpportunityReadByID-2.0" index="20" entity-id="global-unknown#6">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;OpportunityReadByID-2.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;http://${http.listenHost}:${http.listenPort}/${opportunity-read-by-id-2.0.root.uri}&quot; outboundEndpoint-ref=&quot;OpportunityReadByID-2.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/http/endpoint" entity-id="HTTP#6">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/http/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTP_Connector"/>
+            <property name="address" value="http://${http.listenHost}:${opportunity-read-by-id-2.0.port}/${opportunity-read-by-id-2.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="21"/>
+            <property name="port"/>
+            <property name="name" value="OpportunityReadByID-2.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="QuoteSubmitForUpsert-1.0" index="22" entity-id="global-unknown#7">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;QuoteSubmitForUpsert-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;http://${http.listenHost}:${http.listenPort}/${quote-submit-for-upsert-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;QuoteSubmitForUpsert-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/http/endpoint" entity-id="HTTP#7">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/http/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTP_Connector"/>
+            <property name="address" value="http://${http.listenHost}:${quote-submit-for-upsert-1.0.port}/${quote-submit-for-upsert-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="23"/>
+            <property name="port"/>
+            <property name="name" value="QuoteSubmitForUpsert-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="UserAuthentication-1.0" index="24" entity-id="global-unknown#8">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;UserAuthentication-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;http://${http.listenHost}:${http.listenPort}/${user-authentication-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;UserAuthentication-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/http/endpoint" entity-id="HTTP#8">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/http/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTP_Connector"/>
+            <property name="address" value="http://${http.listenHost}:${user-authentication-1.0.port}/${user-authentication-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="25"/>
+            <property name="port"/>
+            <property name="name" value="UserAuthentication-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="SPL-1.0" index="26" entity-id="global-unknown#9">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;SPL-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;http://${http.listenHost}:${http.listenPort}/${splservice-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;SPL-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/http/endpoint" entity-id="HTTP#9">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/http/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTP_Connector"/>
+            <property name="address" value="http://${http.listenHost}:${splservice-1.0.port}/${splservice-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="27"/>
+            <property name="port"/>
+            <property name="name" value="SPL-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="HttpEsbTemplate-1.0" index="28" entity-id="global-unknown#10">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;HttpEsbTemplate-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;http://${http.listenHost}:${http.listenPort}/${esb-templates-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;HttpEsbTemplate-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/http/endpoint" entity-id="HTTP#10">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/http/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTP_Connector"/>
+            <property name="address" value="http://${http.listenHost}:${esb-templates-1.0.port}/${esb-templates-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="29"/>
+            <property name="port"/>
+            <property name="name" value="HttpEsbTemplate-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="QuoteUpsert-1.0" index="30" entity-id="global-unknown#11">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;QuoteUpsert-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;http://${http.listenHost}:${http.listenPort}/${quote-upsert-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;QuoteUpsert-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/http/endpoint" entity-id="HTTP#11">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/http/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTP_Connector"/>
+            <property name="address" value="http://${http.listenHost}:${quote-upsert-1.0.port}/${quote-upsert-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="31"/>
+            <property name="port"/>
+            <property name="name" value="QuoteUpsert-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="SPLServiceSOAP-1.0" index="32" entity-id="global-unknown#12">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;SPLServiceSOAP-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;http://${http.listenHost}:${http.listenPort}/${splsoap-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;SPLServiceSOAP-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/http/endpoint" entity-id="HTTP#12">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/http/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTP_Connector"/>
+            <property name="address" value="http://${http.listenHost}:${splsoap-1.0.http.port}/${splsoap-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="33"/>
+            <property name="port"/>
+            <property name="name" value="SPLServiceSOAP-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="ServiceCloudTrafficCop-1.0" index="34" entity-id="global-unknown#13">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;ServiceCloudTrafficCop-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;http://${http.listenHost}:${http.listenPort}/${service-cloud-traffic-cop-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;ServiceCloudTrafficCop-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/http/endpoint" entity-id="HTTP#13">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/http/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTP_Connector"/>
+            <property name="address" value="http://${http.listenHost}:${service-cloud-traffic-cop-1.0.http.port}/${service-cloud-traffic-cop-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="35"/>
+            <property name="port"/>
+            <property name="name" value="ServiceCloudTrafficCop-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="QuoteStatusUpdate-1.0" index="36" entity-id="global-unknown#14">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;QuoteStatusUpdate-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${quote-status-update-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;QuoteStatusUpdate-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#14">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${quote-status-update-1.0.https.port}/${quote-status-update-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="37"/>
+            <property name="port"/>
+            <property name="name" value="QuoteStatusUpdate-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="DBDirect-2.0" index="38" entity-id="global-unknown#15">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;DBDirect-2.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${dbdirect-2.0.root.uri}&quot; outboundEndpoint-ref=&quot;DBDirect-2.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#15">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${dbdirect-2.0.https.port}/${dbdirect-2.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="39"/>
+            <property name="port"/>
+            <property name="name" value="DBDirect-2.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="DBDirect-Admin-2.0" index="40" entity-id="global-unknown#16">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;DBDirect-Admin-2.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${dbdirect-2.0.admin.root.uri}&quot; outboundEndpoint-ref=&quot;DBDirect-2.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#16">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${dbdirect-2.0.admin.https.port}/${dbdirect-2.0.admin.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="41"/>
+            <property name="port"/>
+            <property name="name" value="DBDirect-Admin-2.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="HttpsEsbTemplate-1.0" index="42" entity-id="global-unknown#17">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;HttpsEsbTemplate-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${esb-templates-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;HttpsEsbTemplate-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#17">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${esb-templates-1.0.https.port}/${esb-templates-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="43"/>
+            <property name="port"/>
+            <property name="name" value="HttpsEsbTemplate-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="License-1.0" index="44" entity-id="global-unknown#18">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;License-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${license-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;License-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#18">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${license-1.0.https.port}/${license-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="45"/>
+            <property name="port"/>
+            <property name="name" value="License-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="Site-1.0" index="46" entity-id="global-unknown#19">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;Site-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${site-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;Site-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#19">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${site-1.0.https.port}/${site-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="47"/>
+            <property name="port"/>
+            <property name="name" value="Site-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="Site-2.0" index="48" entity-id="global-unknown#20">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;Site-2.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${site-2.0.root.uri}&quot; outboundEndpoint-ref=&quot;Site-2.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#20">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${site-2.0.https.port}/${site-2.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="49"/>
+            <property name="port"/>
+            <property name="name" value="Site-2.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="HRFeed-1.0" index="50" entity-id="global-unknown#21">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;HRFeed-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${hr-feed-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;HRFeed-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#21">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${hr-feed-1.0.https.port}/${hr-feed-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="51"/>
+            <property name="port"/>
+            <property name="name" value="HRFeed-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="PocRequest-1.0" index="52" entity-id="global-unknown#22">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;PocRequest-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${poc-request-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;PocRequest-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#22">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${poc-request-1.0.https.port}/${poc-request-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="53"/>
+            <property name="port"/>
+            <property name="name" value="PocRequest-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="Manifest-1.0" index="54" entity-id="global-unknown#23">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;Manifest-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${manifest-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;Manifest-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#23">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${manifest-1.0.https.port}/${manifest-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="55"/>
+            <property name="port"/>
+            <property name="name" value="Manifest-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="Order-Orchestration-1.0" index="56" entity-id="global-unknown#24">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;Order-Orchestration-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${order-orchestration-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;Order-Orchestration-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#24">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${order-orchestration-1.0.https.port}/${order-orchestration-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="57"/>
+            <property name="port"/>
+            <property name="name" value="Order-Orchestration-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="Spl-1.0" index="58" entity-id="global-unknown#25">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;Spl-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${spl-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;Spl-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#25">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${spl-1.0.https.port}/${spl-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="59"/>
+            <property name="port"/>
+            <property name="name" value="Spl-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="rnd-validate-prbsol-1.0" index="60" entity-id="global-unknown#26">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;rnd-validate-prbsol-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${rnd-validate-prbsol-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;rnd-validate-prbsol-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#26">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${rnd-validate-prbsol-1.0.https.port}/${rnd-validate-prbsol-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="61"/>
+            <property name="port"/>
+            <property name="name" value="rnd-validate-prbsol-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="project-submit-for-upsert-1.0" index="62" entity-id="global-unknown#27">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;project-submit-for-upsert-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${project-submit-for-upsert-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;project-submit-for-upsert-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#27">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${project-submit-for-upsert-1.0.https.port}/${project-submit-for-upsert-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="63"/>
+            <property name="port"/>
+            <property name="name" value="project-submit-for-upsert-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="project-upsert-1.0" index="64" entity-id="global-unknown#28">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;project-upsert-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${project-upsert-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;project-upsert-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#28">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${project-upsert-1.0.https.port}/${project-upsert-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="65"/>
+            <property name="port"/>
+            <property name="name" value="project-upsert-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="Notification" index="66" entity-id="global-unknown#29">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;Notification&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${notification.root.uri}&quot; outboundEndpoint-ref=&quot;Notification-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#29">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${notification-2.0.https.port}/${notification.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="67"/>
+            <property name="port"/>
+            <property name="name" value="Notification-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="Order-1.0" index="68" entity-id="global-unknown#30">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;Order-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${order-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;Order-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#30">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${order-1.0.https.port}/${order-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="69"/>
+            <property name="port"/>
+            <property name="name" value="Order-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="Case-create-update-1.0" index="70" entity-id="global-unknown#31">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;Case-create-update-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${case-create-update-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;Case-create-update-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#31">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${case-create-update-1.0.https.port}/${case-create-update-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="71"/>
+            <property name="port"/>
+            <property name="name" value="Case-create-update-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="MDMAccount" index="72" entity-id="global-unknown#32">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;MDMAccount&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${mdm-accounts-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;MDMAccount-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#32">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${mdm-accounts-1.0.https.port}/${mdm-accounts-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="73"/>
+            <property name="port"/>
+            <property name="name" value="MDMAccount-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="hr-org-chart-feed-1.0" index="74" entity-id="global-unknown#33">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;hr-org-chart-feed-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${hr-org-chart-feed-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;hr-org-chart-feed-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#33">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${hr-org-chart-feed-1.0.https.port}/${hr-org-chart-feed-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="75"/>
+            <property name="port"/>
+            <property name="name" value="hr-org-chart-feed-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="Case-activity-1.0" index="76" entity-id="global-unknown#34">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;Case-activity-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${case-activity-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;Case-activity-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#34">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${case-activity-1.0.https.port}/${case-activity-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="77"/>
+            <property name="port"/>
+            <property name="name" value="Case-activity-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="Attachment-meta-data-1.0" index="78" entity-id="global-unknown#35">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;Attachment-meta-data-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${attachment-meta-data-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;Attachment-meta-data-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#35">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${attachment-meta-data-1.0.https.port}/${attachment-meta-data-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="79"/>
+            <property name="port"/>
+            <property name="name" value="Attachment-meta-data-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="Attachment-notification-1.0" index="80" entity-id="global-unknown#36">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;Attachment-notification-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${attachment-notification-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;Attachment-notification-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#36">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${attachment-notification-1.0.https.port}/${attachment-notification-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="81"/>
+            <property name="port"/>
+            <property name="name" value="Attachment-notification-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="Territory-Hiearchcy-1.0" index="82" entity-id="global-unknown#37">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;Territory-Hiearchcy-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${territory-hierarchy-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;Territory-Hiearchcy-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#37">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${territory-hierarchy-1.0.https.port}/${territory-hierarchy-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="83"/>
+            <property name="port"/>
+            <property name="name" value="Territory-Hiearchcy-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="Employee-1.0" index="84" entity-id="global-unknown#38">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;Employee-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${employee-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;Employee-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#38">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${employee-1.0.https.port}/${employee-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="85"/>
+            <property name="port"/>
+            <property name="name" value="Employee-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="EmployeeJob-1.0" index="86" entity-id="global-unknown#39">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;EmployeeJob-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${employee-jobs-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;Employee-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#39">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${employee-1.0.https.port}/${employee-jobs-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="87"/>
+            <property name="port"/>
+            <property name="name" value="EmployeeJob-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="Case-Survey-1.0" index="88" entity-id="global-unknown#40">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;Case-Survey-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${case-survey-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;Case-Survey-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#40">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${case-survey-1.0.https.port}/${case-survey-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="89"/>
+            <property name="port"/>
+            <property name="name" value="Case-Survey-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="Retrieve-Case-Details-1.0" index="90" entity-id="global-unknown#41">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;Retrieve-Case-Details-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${retrieve-case-details-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;Retrieve-Case-Details-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#41">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${retrieve-case-details-1.0.https.port}/${retrieve-case-details-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="91"/>
+            <property name="port"/>
+            <property name="name" value="Retrieve-Case-Details-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="site-association-1.0" index="92" entity-id="global-unknown#42">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;site-association-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${site-association-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;site-association-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#42">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${site-association-1.0.https.port}/${site-association-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="93"/>
+            <property name="port"/>
+            <property name="name" value="site-association-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="contact-submit-for-upsert-1.0" index="94" entity-id="global-unknown#43">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;contact-submit-for-upsert-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${contact-submit-for-upsert-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;contact-submit-for-upsert-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#43">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${contact-submit-for-upsert-1.0.https.port}/${contact-submit-for-upsert-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="95"/>
+            <property name="port"/>
+            <property name="name" value="contact-submit-for-upsert-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="Logo-1.0" index="96" entity-id="global-unknown#44">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;Logo-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${logo-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;Logo-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#44">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${logo-1.0.https.port}/${logo-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="97"/>
+            <property name="port"/>
+            <property name="name" value="Logo-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="Sfdc-Select-1.0" index="98" entity-id="global-unknown#45">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;Sfdc-Select-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${sfdc-select-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;Sfdc-Select-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#45">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${sfdc-select-1.0.https.port}/${sfdc-select-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="99"/>
+            <property name="port"/>
+            <property name="name" value="Sfdc-Select-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="Case-Search-1.0" index="100" entity-id="global-unknown#46">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;Case-Search-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${case-search-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;Case-Search-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#46">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${case-search-1.0.https.port}/${case-search-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="101"/>
+            <property name="port"/>
+            <property name="name" value="Case-Search-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="Logo-Job-1.0" index="102" entity-id="global-unknown#47">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;Logo-Job-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${logo-job-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;Logo-Job-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#47">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${logo-job-1.0.https.port}/${logo-job-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="103"/>
+            <property name="port"/>
+            <property name="name" value="Logo-Job-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="Email-To-Case-1.0" index="104" entity-id="global-unknown#48">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;Email-To-Case-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${email-to-case-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;Email-To-Case-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#48">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${email-to-case-1.0.https.port}/${email-to-case-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="105"/>
+            <property name="port"/>
+            <property name="name" value="Email-To-Case-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="Email-To-Case-Poller-1.0" index="106" entity-id="global-unknown#49">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;Email-To-Case-Poller-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${email-to-case-poller-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;Email-To-Case-Poller-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#49">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${email-to-case-poller-1.0.https.port}/${email-to-case-poller-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="107"/>
+            <property name="port"/>
+            <property name="name" value="Email-To-Case-Poller-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="Company-1.0" index="108" entity-id="global-unknown#50">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;Company-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${country-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;Country-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#50">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${country-1.0.https.port}/${country-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="109"/>
+            <property name="port"/>
+            <property name="name" value="Country-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="MDM-IPASign-1.0" index="110" entity-id="global-unknown#51">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;MDM-IPASign-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${mdm-ipasign-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;MDM-IPASign-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#51">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${mdm-ipasign-1.0.https.port}/${mdm-ipasign-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="111"/>
+            <property name="port"/>
+            <property name="name" value="MDM-IPASign-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="Log-Redirector-1.0" index="112" entity-id="global-unknown#52">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;Log-Redirector-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${log-redirector-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;Log-Redirector-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#52">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${log-redirector-1.0.https.port}/${log-redirector-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="113"/>
+            <property name="port"/>
+            <property name="name" value="Log-Redirector-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="Log-Parser-1.0" index="114" entity-id="global-unknown#53">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;Log-Parser-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${log-parser-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;Log-Parser-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#53">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${log-parser-1.0.https.port}/${log-parser-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="115"/>
+            <property name="port"/>
+            <property name="name" value="Log-Parser-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="Billing-Report-1.0" index="116" entity-id="global-unknown#54">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;Billing-Report-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${billing-report-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;Billing-Report-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#54">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${billing-report-1.0.https.port}/${billing-report-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="117"/>
+            <property name="port"/>
+            <property name="name" value="Billing-Report-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="Learning-Activity-1.0" index="118" entity-id="global-unknown#55">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;Learning-Activity-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${learning-activity-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;Learning-Activity-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#55">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${learning-activity-1.0.https.port}/${learning-activity-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="119"/>
+            <property name="port"/>
+            <property name="name" value="Learning-Activity-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="Command-Scheduler-1.0" index="120" entity-id="global-unknown#56">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;Command-Scheduler-1.0&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${command-scheduler-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;Command-Scheduler-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#56">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${command-scheduler-1.0.https.port}/${command-scheduler-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="121"/>
+            <property name="port"/>
+            <property name="name" value="Command-Scheduler-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="service-assessor-1.0-proxy" index="122" entity-id="global-unknown#57">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;service-assessor-1.0-proxy&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${service-assessor-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;service-assessor-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#57">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${service-assessor-1.0.https.port}/${service-assessor-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="123"/>
+            <property name="port"/>
+            <property name="name" value="service-assessor-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <global-unknown description="false" unknownName="rule-routing-1.0-proxy" index="124" entity-id="global-unknown#58">
+        <content>&lt;pattern:http-proxy xmlns:pattern=&quot;http://www.mulesoft.org/schema/mule/pattern&quot; name=&quot;rule-routing-1.0-proxy&quot; transformer-refs=&quot;incoming-request-property-transformer&quot; inboundAddress=&quot;https://${http.listenHost}:${https.listenPort}/${rule-routing-1.0.root.uri}&quot; outboundEndpoint-ref=&quot;rule-routing-1.0-outbound-endpoint&quot;/&gt;</content>
+    </global-unknown>
+    <global-element name="HTTP" type="http://www.mulesoft.org/schema/mule/https/endpoint" entity-id="HTTP#58">
+        <properties>
+            <property name="mimeType"/>
+            <property name="path"/>
+            <property name="responseTransformer-refs"/>
+            <property name="exchange-pattern"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="ref"/>
+            <property name="password"/>
+            <property name="keep-alive"/>
+            <property name="followRedirects"/>
+            <property name="host"/>
+            <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/https/endpoint"/>
+            <property name="businessEventsLabel"/>
+            <property name="contentType"/>
+            <property name="responseTimeout" value="${outbound.response.timeout}"/>
+            <property name="connector-ref" value="EAI_HTTPS_Connector"/>
+            <property name="address" value="https://${http.listenHost}:${rule-routing-1.0.https.port}/${rule-routing-1.0.root.uri}"/>
+            <property name="method"/>
+            <property name="encoding"/>
+            <property name="httpLabel"/>
+            <property name="disableTransportTransformer"/>
+            <property name="auxiliary;index" value="125"/>
+            <property name="port"/>
+            <property name="name" value="rule-routing-1.0-outbound-endpoint"/>
+            <property name="transformer-refs"/>
+            <property name="user"/>
+        </properties>
+    </global-element>
+    <flow SubFlow="false" name="ConfigInfoFlow" type="http://www.mulesoft.org/schema/mule/core/flow" entity-id="d2d6a3b3-4426-4d8c-84b9-4be7c3cd48c0">
+        <properties>
+            <property name="initialState"/>
+            <property name="processingStrategy2"/>
+            <property name="processingStrategy"/>
+            <property name="bussinessEventsLabel"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="auxiliary;index" value="126"/>
+        </properties>
+        <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#1">
+            <graphicalData x="0" y="0" width="0" height="0"/>
+            <endpoint direction="Inbound" message-exchange-pattern="RequestResponse" name="HTTP" type="http://www.mulesoft.org/schema/mule/http/endpoint" entity-id="HTTP#59">
+                <graphicalData x="0" y="0" width="0" height="0"/>
+                <properties>
+                    <property name="connector-ref"/>
+                    <property name="address"/>
+                    <property name="method"/>
+                    <property name="mimeType" value="text/plain"/>
+                    <property name="encoding" value="UTF-8"/>
+                    <property name="httpLabel"/>
+                    <property name="disableTransportTransformer"/>
+                    <property name="auxiliary;index" value="127"/>
+                    <property name="path" value="${eai-services-router-proxy-1.0.root.uri}/config-info"/>
+                    <property name="responseTransformer-refs"/>
+                    <property name="exchange-pattern" value="request-response"/>
+                    <property name="tracking:enable-default-events"/>
+                    <property name="ref"/>
+                    <property name="password"/>
+                    <property name="keep-alive"/>
+                    <property name="port" value="${http.listenPort}"/>
+                    <property name="followRedirects"/>
+                    <property name="host" value="${http.listenHost}"/>
+                    <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/http/endpoint"/>
+                    <property name="transformer-refs"/>
+                    <property name="businessEventsLabel"/>
+                    <property name="user"/>
+                    <property name="contentType"/>
+                    <property name="responseTimeout"/>
+                </properties>
+                <description>Handle request for config</description>
+            </endpoint>
+            <pattern name="Filter favicon" type="http://www.mulesoft.org/schema/mule/core/message-filter" entity-id="Message#1">
+                <graphicalData x="0" y="0" width="0" height="0"/>
+                <properties>
+                    <property name="throwOnUnaccepted"/>
+                    <property name="onUnaccepted"/>
+                    <property name="auxiliary;index" value="128"/>
+                    <property-collection name="@http://www.mulesoft.org/schema/mule/core/not-filter;0">
+                        <property name="auxiliary;wrapIn" value="129"/>
+                        <property name="auxiliary;index" value="129"/>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/core/wildcard-filter;1">
+                            <property name="caseSensitive" value="false"/>
+                            <property name="pattern" value="/favicon.ico"/>
+                            <property name="auxiliary;wrapIn" value="130"/>
+                            <property name="auxiliary;index" value="130"/>
+                        </property-collection>
+                    </property-collection>
+                </properties>
+                <description>Drop the favicon browser request</description>
+            </pattern>
+            <pattern name="Java" type="org.mule.tooling.ui.modules.core.pattern.customTransformer" entity-id="Java#2">
+                <graphicalData x="0" y="0" width="0" height="0"/>
+                <properties>
+                    <property name="returnClass"/>
+                    <property name="mimeType"/>
+                    <property name="encoding"/>
+                    <property name="class" value="com.ca.eai.esb.transformer.ProxyConfigurationTransformer"/>
+                    <property name="ignoreBadInput"/>
+                    <property name="auxiliary;index" value="131"/>
+                    <property-collection name="@http://www.springframework.org/schema/beans/property;0">
+                        <property name="name" value="instance"/>
+                        <property name="auxiliary;wrapIn" value="132"/>
+                        <property name="value" value="${mule.instance}"/>
+                        <property name="auxiliary;index" value="132"/>
+                    </property-collection>
+                    <property-collection name="@http://www.springframework.org/schema/beans/property;1">
+                        <property name="name" value="proxies"/>
+                        <property name="auxiliary;wrapIn" value="133"/>
+                        <property name="auxiliary;index" value="133"/>
+                        <property-collection name="@http://www.springframework.org/schema/beans/list;1">
+                            <property name="auxiliary;wrapIn" value="134"/>
+                            <property name="auxiliary;index" value="134"/>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;41">
+<property name="id" value="site-association-1.0"/>
+<property name="auxiliary;wrapIn" value="255"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="255"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="257"/>
+    <property name="value" value="https://${http.listenHost}:${site-association-1.0.https.port}/${site-association-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="257"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="256"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${site-association-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="256"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;40">
+<property name="id" value="Retrieve-Case-Details-1.0"/>
+<property name="auxiliary;wrapIn" value="252"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="252"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="254"/>
+    <property name="value" value="https://${http.listenHost}:${retrieve-case-details-1.0.https.port}/${retrieve-case-details-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="254"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="253"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${retrieve-case-details-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="253"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;39">
+<property name="id" value="Case-Survey-1.0"/>
+<property name="auxiliary;wrapIn" value="249"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="249"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="251"/>
+    <property name="value" value="https://${http.listenHost}:${case-survey-1.0.https.port}/${case-survey-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="251"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="250"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${case-survey-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="250"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;36">
+<property name="id" value="SPLServiceSOAP-1.0"/>
+<property name="auxiliary;wrapIn" value="240"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="240"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="242"/>
+    <property name="value" value="https://${http.listenHost}:${splsoap-1.0.http.port}/${splsoap-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="242"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="241"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${splsoap-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="241"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;35">
+<property name="id" value="Attachment-notification-1.0"/>
+<property name="auxiliary;wrapIn" value="237"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="237"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="239"/>
+    <property name="value" value="https://${http.listenHost}:${attachment-notification-1.0.https.port}/${attachment-notification-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="239"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="238"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${attachment-notification-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="238"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;38">
+<property name="id" value="Employee-1.0"/>
+<property name="auxiliary;wrapIn" value="246"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="246"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="248"/>
+    <property name="value" value="https://${http.listenHost}:${employee-1.0.https.port}/${employee-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="248"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="247"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${employee-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="247"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;37">
+<property name="id" value="TerritoryHierarchy-1.0"/>
+<property name="auxiliary;wrapIn" value="243"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="243"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="245"/>
+    <property name="value" value="https://${http.listenHost}:${territory-hierarchy-1.0.https.port}/${territory-hierarchy-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="245"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="244"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${territory-hierarchy-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="244"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;32">
+<property name="id" value="hr-org-chart-feed-1.0"/>
+<property name="auxiliary;wrapIn" value="228"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="228"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="230"/>
+    <property name="value" value="https://${http.listenHost}:${hr-org-chart-feed-1.0.https.port}/${hr-org-chart-feed-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="230"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="229"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${hr-org-chart-feed-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="229"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;31">
+<property name="id" value="AccountSubmitForUpsert-1.0"/>
+<property name="auxiliary;wrapIn" value="225"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="225"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="227"/>
+    <property name="value" value="https://${http.listenHost}:${account-submit-for-upsert-1.0.https.port}/${account-submit-for-upsert-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="227"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="226"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${account-submit-for-upsert-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="226"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;34">
+<property name="id" value="Attachment-meta-data-1.0"/>
+<property name="auxiliary;wrapIn" value="234"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="234"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="236"/>
+    <property name="value" value="https://${http.listenHost}:${attachment-meta-data-1.0.https.port}/${attachment-meta-data-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="236"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="235"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${attachment-meta-data-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="235"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;33">
+<property name="id" value="Case-activity-1.0"/>
+<property name="auxiliary;wrapIn" value="231"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="231"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="233"/>
+    <property name="value" value="https://${http.listenHost}:${case-activity-1.0.https.port}/${case-activity-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="233"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="232"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${case-activity-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="232"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;6">
+<property name="id" value="OpportunityReadByID-2.0"/>
+<property name="auxiliary;wrapIn" value="150"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="150"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="152"/>
+    <property name="value" value="http://${http.listenHost}:${opportunity-read-by-id-2.0.port}/${opportunity-read-by-id-2.0.root.uri}"/>
+    <property name="auxiliary;index" value="152"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="151"/>
+    <property name="value" value="http://${http.listenHost}:${http.listenPort}/${opportunity-read-by-id-2.0.root.uri}"/>
+    <property name="auxiliary;index" value="151"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;50">
+<property name="id" value="Country-1.0"/>
+<property name="auxiliary;wrapIn" value="282"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="282"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="284"/>
+    <property name="value" value="https://${http.listenHost}:${country-1.0.https.port}/${country-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="284"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="283"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${country-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="283"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;7">
+<property name="id" value="QuoteSubmitForUpsert-1.0"/>
+<property name="auxiliary;wrapIn" value="153"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="153"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="155"/>
+    <property name="value" value="http://${http.listenHost}:${quote-submit-for-upsert-1.0.port}/${quote-submit-for-upsert-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="155"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="154"/>
+    <property name="value" value="http://${http.listenHost}:${http.listenPort}/${quote-submit-for-upsert-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="154"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;8">
+<property name="id" value="UserAuthentication-1.0"/>
+<property name="auxiliary;wrapIn" value="156"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="156"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="158"/>
+    <property name="value" value="http://${http.listenHost}:${user-authentication-1.0.port}/${user-authentication-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="158"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="157"/>
+    <property name="value" value="http://${http.listenHost}:${http.listenPort}/${user-authentication-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="157"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;52">
+<property name="id" value="Log-Redirector-1.0"/>
+<property name="auxiliary;wrapIn" value="288"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="288"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="290"/>
+    <property name="value" value="https://${http.listenHost}:${log-redirector-1.0.https.port}/${log-redirector-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="290"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="289"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${log-redirector-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="289"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;9">
+<property name="id" value="QuoteStatusUpdate-1.0"/>
+<property name="auxiliary;wrapIn" value="159"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="159"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="161"/>
+    <property name="value" value="https://${http.listenHost}:${quote-status-update-1.0.port}/${quote-status-update-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="161"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="160"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${quote-status-update-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="160"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;51">
+<property name="id" value="MDM-IPASign-1.0"/>
+<property name="auxiliary;wrapIn" value="285"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="285"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="287"/>
+    <property name="value" value="https://${http.listenHost}:${mdm-ipasign-1.0.https.port}/${mdm-ipasign-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="287"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="286"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${mdm-ipasign-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="286"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;2">
+<property name="id" value="HttpsHealthcheckService"/>
+<property name="auxiliary;wrapIn" value="138"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="138"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="140"/>
+    <property name="value" value="https://${http.listenHost}:${https-healthcheck.port}/${https-healthcheck.root.uri}"/>
+    <property name="auxiliary;index" value="140"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="139"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${https-healthcheck.root.uri}"/>
+    <property name="auxiliary;index" value="139"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;3">
+<property name="id" value="JVMParametersService"/>
+<property name="auxiliary;wrapIn" value="141"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="141"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="143"/>
+    <property name="value" value="http://${http.listenHost}:${jvm-parameters.port}/${jvm-parameters.root.uri}"/>
+    <property name="auxiliary;index" value="143"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="142"/>
+    <property name="value" value="http://${http.listenHost}:${http.listenPort}/${jvm-parameters.root.uri}"/>
+    <property name="auxiliary;index" value="142"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;4">
+<property name="id" value="AccountReadByID-2.0"/>
+<property name="auxiliary;wrapIn" value="144"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="144"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="146"/>
+    <property name="value" value="http://${http.listenHost}:${account-read-by-id-2.0.port}/${account-read-by-id-2.0.root.uri}"/>
+    <property name="auxiliary;index" value="146"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="145"/>
+    <property name="value" value="http://${http.listenHost}:${http.listenPort}/${account-read-by-id-2.0.root.uri}"/>
+    <property name="auxiliary;index" value="145"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;5">
+<property name="id" value="OpportunityAccountReadByOpportuntiyId-2.0"/>
+<property name="auxiliary;wrapIn" value="147"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="147"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="149"/>
+    <property name="value" value="http://${http.listenHost}:${opportunity-account-read-by-opportuntiy-id-2.0.port}/${opportunity-account-read-by-opportuntiy-id-2.0.root.uri}"/>
+    <property name="auxiliary;index" value="149"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="148"/>
+    <property name="value" value="http://${http.listenHost}:${http.listenPort}/${opportunity-account-read-by-opportuntiy-id-2.0.root.uri}"/>
+    <property name="auxiliary;index" value="148"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;47">
+<property name="id" value="Logo-Job-1.0"/>
+<property name="auxiliary;wrapIn" value="273"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="273"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="275"/>
+    <property name="value" value="https://${http.listenHost}:${logo-job-1.0.https.port}/${logo-job-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="275"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="274"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${logo-job-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="274"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;46">
+<property name="id" value="Case-Search-1.0"/>
+<property name="auxiliary;wrapIn" value="270"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="270"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="272"/>
+    <property name="value" value="https://${http.listenHost}:${case-search-1.0.https.port}/${case-search-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="272"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="271"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${case-search-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="271"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;49">
+<property name="id" value="Email-To-Case-Poller-1.0"/>
+<property name="auxiliary;wrapIn" value="279"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="279"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="281"/>
+    <property name="value" value="https://${http.listenHost}:${email-to-case-poller-1.0.https.port}/${email-to-case-poller-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="281"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="280"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${email-to-case-poller-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="280"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;1">
+<property name="id" value="HttpHealthcheckService"/>
+<property name="auxiliary;wrapIn" value="135"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="135"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="137"/>
+    <property name="value" value="http://${http.listenHost}:${http-healthcheck.port}/${http-healthcheck.root.uri}"/>
+    <property name="auxiliary;index" value="137"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="136"/>
+    <property name="value" value="http://${http.listenHost}:${http.listenPort}/${http-healthcheck.root.uri}"/>
+    <property name="auxiliary;index" value="136"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;48">
+<property name="id" value="Email-To-Case-1.0"/>
+<property name="auxiliary;wrapIn" value="276"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="276"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="278"/>
+    <property name="value" value="https://${http.listenHost}:${email-to-case-1.0.https.port}/${email-to-case-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="278"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="277"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${email-to-case-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="277"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;43">
+<property name="id" value="service-cloud-traffic-cop-1.0"/>
+<property name="auxiliary;wrapIn" value="261"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="261"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="263"/>
+    <property name="value" value="https://${http.listenHost}:${service-cloud-traffic-cop-1.0.http.port}/${service-cloud-traffic-cop-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="263"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="262"/>
+    <property name="value" value="https://${http.listenHost}:${http.listenPort}/${service-cloud-traffic-cop-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="262"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;42">
+<property name="id" value="contact-submit-for-upsert-1.0"/>
+<property name="auxiliary;wrapIn" value="258"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="258"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="260"/>
+    <property name="value" value="https://${http.listenHost}:${contact-submit-for-upsert-1.0.https.port}/${contact-submit-for-upsert-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="260"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="259"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${contact-submit-for-upsert-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="259"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;45">
+<property name="id" value="Sfdc-Select-1.0"/>
+<property name="auxiliary;wrapIn" value="267"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="267"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="269"/>
+    <property name="value" value="https://${http.listenHost}:${sfdc-select-1.0.https.port}/${sfdc-select-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="269"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="268"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${sfdc-select-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="268"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;44">
+<property name="id" value="Logo-1.0"/>
+<property name="auxiliary;wrapIn" value="264"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="264"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="266"/>
+    <property name="value" value="https://${http.listenHost}:${logo-1.0.https.port}/${logo-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="266"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="265"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${logo-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="265"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;18">
+<property name="id" value="PocRequest-1.0"/>
+<property name="auxiliary;wrapIn" value="186"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="186"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="188"/>
+    <property name="value" value="https://${http.listenHost}:${poc-request-1.0.https.port}/${poc-request-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="188"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="187"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${poc-request-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="187"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;17">
+<property name="id" value="HRFeed-1.0"/>
+<property name="auxiliary;wrapIn" value="183"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="183"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="185"/>
+    <property name="value" value="https://${http.listenHost}:${hr-feed-1.0.https.port}/${hr-feed-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="185"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="184"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${hr-feed-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="184"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;19">
+<property name="id" value="QuoteUpsert-1.0"/>
+<property name="auxiliary;wrapIn" value="189"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="189"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="191"/>
+    <property name="value" value="http://${http.listenHost}:${quote-upsert-1.0.port}/${quote-upsert-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="191"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="190"/>
+    <property name="value" value="http://${http.listenHost}:${http.listenPort}/${quote-upsert-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="190"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;14">
+<property name="id" value="License-1.0"/>
+<property name="auxiliary;wrapIn" value="174"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="174"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="176"/>
+    <property name="value" value="https://${http.listenHost}:${license-1.0.https.port}/${license-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="176"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="175"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${license-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="175"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;58">
+<property name="id" value="rule-routing-1.0"/>
+<property name="auxiliary;wrapIn" value="306"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="306"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="308"/>
+    <property name="value" value="https://${http.listenHost}:${rule-routing-1.0.https.port}/${rule-routing-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="308"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="307"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${rule-routing-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="307"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;13">
+<property name="id" value="HttpsEsbTemplate-1.0"/>
+<property name="auxiliary;wrapIn" value="171"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="171"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="173"/>
+    <property name="value" value="https://${http.listenHost}:${esb-templates-1.0.https.port}/${esb-templates-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="173"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="172"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${esb-templates-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="172"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;57">
+<property name="id" value="service-assessor-1.0"/>
+<property name="auxiliary;wrapIn" value="303"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="303"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="305"/>
+    <property name="value" value="https://${http.listenHost}:${service-assessor-1.0.https.port}/${service-assessor-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="305"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="304"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${service-assessor-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="304"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;16">
+<property name="id" value="Site-2.0"/>
+<property name="auxiliary;wrapIn" value="180"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="180"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="182"/>
+    <property name="value" value="https://${http.listenHost}:${site-2.0.https.port}/${site-2.0.root.uri}"/>
+    <property name="auxiliary;index" value="182"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="181"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${site-2.0.root.uri}"/>
+    <property name="auxiliary;index" value="181"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;15">
+<property name="id" value="Site-1.0"/>
+<property name="auxiliary;wrapIn" value="177"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="177"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="179"/>
+    <property name="value" value="https://${http.listenHost}:${site-1.0.https.port}/${site-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="179"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="178"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${site-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="178"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;10">
+<property name="id" value="DBDirect-2.0"/>
+<property name="auxiliary;wrapIn" value="162"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="162"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="164"/>
+    <property name="value" value="https://${http.listenHost}:${dbdirect-2.0.port}/${dbdirect-2.0.root.uri}"/>
+    <property name="auxiliary;index" value="164"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="163"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${dbdirect-2.0.root.uri}"/>
+    <property name="auxiliary;index" value="163"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;54">
+<property name="id" value="Billing-Report-1.0"/>
+<property name="auxiliary;wrapIn" value="294"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="294"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="296"/>
+    <property name="value" value="https://${http.listenHost}:${billing-report-1.0.https.port}/${billing-report-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="296"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="295"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${billing-report-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="295"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;53">
+<property name="id" value="Log-Parser-1.0"/>
+<property name="auxiliary;wrapIn" value="291"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="291"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="293"/>
+    <property name="value" value="https://${http.listenHost}:${log-parser-1.0.https.port}/${log-parser-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="293"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="292"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${log-parser-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="292"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;12">
+<property name="id" value="HttpEsbTemplate-1.0"/>
+<property name="auxiliary;wrapIn" value="168"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="168"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="170"/>
+    <property name="value" value="http://${http.listenHost}:${esb-templates-1.0.port}/${esb-templates-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="170"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="169"/>
+    <property name="value" value="http://${http.listenHost}:${http.listenPort}/${esb-templates-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="169"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;56">
+<property name="id" value="Command-Scheduler-1.0"/>
+<property name="auxiliary;wrapIn" value="300"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="300"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="302"/>
+    <property name="value" value="https://${http.listenHost}:${command-scheduler-1.0.https.port}/${command-scheduler-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="302"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="301"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${command-scheduler-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="301"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;11">
+<property name="id" value="SPL-1.0"/>
+<property name="auxiliary;wrapIn" value="165"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="165"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="167"/>
+    <property name="value" value="http://${http.listenHost}:${splservice-1.0.port}/${splservice-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="167"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="166"/>
+    <property name="value" value="http://${http.listenHost}:${http.listenPort}/${splservice-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="166"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;55">
+<property name="id" value="Learning-Activity-1.0"/>
+<property name="auxiliary;wrapIn" value="297"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="297"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="299"/>
+    <property name="value" value="https://${http.listenHost}:${learning-activity-1.0.https.port}/${learning-activity-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="299"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="298"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${learning-activity-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="298"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;30">
+<property name="id" value="AccountSearch-1.0"/>
+<property name="auxiliary;wrapIn" value="222"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="222"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="224"/>
+    <property name="value" value="https://${http.listenHost}:${account-search-1.0.https.port}/${account-search-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="224"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="223"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${account-search-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="223"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;29">
+<property name="id" value="MDMAccount-1.0"/>
+<property name="auxiliary;wrapIn" value="219"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="219"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="221"/>
+    <property name="value" value="https://${http.listenHost}:${mdm-accounts-1.0.https.port}/${mdm-accounts-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="221"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="220"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${mdm-accounts-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="220"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;28">
+<property name="id" value="Case-create-update-1.0"/>
+<property name="auxiliary;wrapIn" value="216"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="216"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="218"/>
+    <property name="value" value="https://${http.listenHost}:${case-create-update-1.0.https.port}/${case-create-update-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="218"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="217"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${case-create-update-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="217"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;25">
+<property name="id" value="project-upsert-1.0"/>
+<property name="auxiliary;wrapIn" value="207"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="207"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="209"/>
+    <property name="value" value="https://${http.listenHost}:${project-upsert-1.0.https.port}/${project-upsert-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="209"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="208"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${project-upsert-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="208"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;24">
+<property name="id" value="project-submit-for-upsert-1.0"/>
+<property name="auxiliary;wrapIn" value="204"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="204"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="206"/>
+    <property name="value" value="https://${http.listenHost}:${project-submit-for-upsert-1.0.https.port}/${project-submit-for-upsert-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="206"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="205"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${project-submit-for-upsert-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="205"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;27">
+<property name="id" value="Order-1.0"/>
+<property name="auxiliary;wrapIn" value="213"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="213"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="215"/>
+    <property name="value" value="https://${http.listenHost}:${order-1.0.https.port}/${order-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="215"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="214"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${order-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="214"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;26">
+<property name="id" value="Notification"/>
+<property name="auxiliary;wrapIn" value="210"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="210"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="212"/>
+    <property name="value" value="https://${http.listenHost}:${notification-2.0.https.port}/${notification.root.uri}"/>
+    <property name="auxiliary;index" value="212"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="211"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${notification.root.uri}"/>
+    <property name="auxiliary;index" value="211"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;21">
+<property name="id" value="Order-Orchestration-1.0"/>
+<property name="auxiliary;wrapIn" value="195"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="195"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="197"/>
+    <property name="value" value="https://${http.listenHost}:${order-orchestration-1.0.https.port}/${order-orchestration-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="197"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="196"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${order-orchestration-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="196"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;20">
+<property name="id" value="Manifest-1.0"/>
+<property name="auxiliary;wrapIn" value="192"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="192"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="194"/>
+    <property name="value" value="https://${http.listenHost}:${manifest-1.0.https.port}/${manifest-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="194"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="193"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${manifest-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="193"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;23">
+<property name="id" value="rnd-validate-prbsol-1.0"/>
+<property name="auxiliary;wrapIn" value="201"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="201"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="203"/>
+    <property name="value" value="https://${http.listenHost}:${rnd-validate-prbsol-1.0.https.port}/${rnd-validate-prbsol-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="203"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="202"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${rnd-validate-prbsol-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="202"/>
+</property-collection>
+                            </property-collection>
+                            <property-collection name="@http://www.springframework.org/schema/beans/bean;22">
+<property name="id" value="Spl-1.0"/>
+<property name="auxiliary;wrapIn" value="198"/>
+<property name="class" value="com.ca.eai.esb.transformer.ServiceProxy"/>
+<property name="auxiliary;index" value="198"/>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;2">
+    <property name="auxiliary;wrapIn" value="200"/>
+    <property name="value" value="https://${http.listenHost}:${spl-1.0.https.port}/${spl-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="200"/>
+</property-collection>
+<property-collection name="@http://www.springframework.org/schema/beans/constructor-arg;1">
+    <property name="auxiliary;wrapIn" value="199"/>
+    <property name="value" value="https://${http.listenHost}:${https.listenPort}/${spl-1.0.root.uri}"/>
+    <property name="auxiliary;index" value="199"/>
+</property-collection>
+                            </property-collection>
+                        </property-collection>
+                    </property-collection>
+                </properties>
+            </pattern>
+            <pattern name="Object to String" type="http://www.mulesoft.org/schema/mule/core/object-to-string-transformer" entity-id="Object to String#1">
+                <graphicalData x="0" y="0" width="0" height="0"/>
+                <properties>
+                    <property name="returnClass"/>
+                    <property name="mimeType" value="text/html"/>
+                    <property name="encoding"/>
+                    <property name="ignoreBadInput"/>
+                    <property name="auxiliary;index" value="309"/>
+                </properties>
+            </pattern>
+        </lane>
+    </flow>
+</mule-configuration>

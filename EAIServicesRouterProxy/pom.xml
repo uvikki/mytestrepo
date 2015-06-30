@@ -1,0 +1,21 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.ca.eai.esb</groupId>
+  <artifactId>eai-services-router-proxy</artifactId>
+    <packaging>mule</packaging>
+    <version>1.0.20</version>
+    <name>eai-services-router-proxy Project</name>
+    <description>EAI Proxy for EAI Mule flows</description>
+	
+ 	<properties>
+		<serviceType>multi</serviceType>
+    </properties>       
+    
+    <!-- Global configuration is now in the parent pom, add specifics for your artifact in here -->
+	<parent>
+		<groupId>com.ca.eai</groupId>
+		<artifactId>esb-mule-parent-ee</artifactId>
+		<version>1.0</version>
+	</parent>          
+ 
+</project>

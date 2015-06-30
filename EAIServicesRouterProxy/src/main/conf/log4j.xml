@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration PUBLIC "-//APACHE//DTD LOG4J 1.2//EN" "http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/xml/doc-files/log4j.dtd">
+<log4j:configuration>
+    <appender name="rollingFile" class="org.apache.log4j.rolling.RollingFileAppender">
+        <param name="Threshold" value="info" />
+        <rollingPolicy class="org.apache.log4j.rolling.TimeBasedRollingPolicy">
+            <param name="ActiveFileName" value="${mule.log.dir}/${mule.instance}-app-EAIServicesRouterProxy-1.0.log" />
+            <param name="FileNamePattern" value="${mule.log.archive.dir}/${mule.instance}-app-EAIServicesRouterProxy-1.0.log.%d{yyyy-MM-dd-HH}.gz" />
+        </rollingPolicy>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d [%t] %5p (%F:%L) - %m%n" />
+        </layout>
+    </appender>
+
+    <appender name="quietinfo" class="org.apache.log4j.ConsoleAppender">
+        <param name="Threshold" value="error" />
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%m%n" />
+        </layout>
+    </appender>
+
+    <appender name="pingLog" class="org.apache.log4j.RollingFileAppender">
+        <param name="File" value="${mule.log.dir}/${mule.instance}-ping-EAIServicesRouterProxy-1.0.log" />
+        <param name="Append" value="true" />
+        <param name="MaxFileSize" value="5KB" />
+        <param name="MaxBackupIndex" value="1" />
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d [%t] %p - %m%n" />
+        </layout>
+        <filter class="org.apache.log4j.varia.LevelRangeFilter">
+            <param name="LevelMin" value="ERROR" />
+        </filter>
+    </appender>
+
+    <!-- Apache -->
+    <logger name="org.apache">
+        <level value="warn" />
+    </logger>
+
+    <!-- Spring -->
+    <logger name="org.springframework.beans.factory">
+        <level value="warn" />
+    </logger>
+
+    <!-- Mule -->
+    <logger name="org.mule">
+        <level value="info" />
+    </logger>
+    <logger name="org.mulesoft">
+        <level value="info" />
+    </logger>
+    <logger name="org.mule.lifecycle">
+        <level value="warn" />
+    </logger>
+    <logger name="org.mule.transport.service">
+        <level value="warn" />
+    </logger>
+    <logger name="org.mule.transport.jdbc">
+        <level value="warn" />
+    </logger>
+    <!-- Get rid of the incredibly annoying advisory that an optional XPath value is not present. -->
+    <logger name="org.mule.transformer.simple.AddFlowVariableTransformer">
+        <level value="warn" />
+    </logger>
+    <logger name="org.mule.transformer.simple.AddSessionVariableTransformer">
+        <level value="warn" />
+    </logger>
+    <!-- Get rid of the incredibly annoying advisory that there's only one value in a collection. -->
+    <logger name="org.mule.routing.ExpressionSplitter">
+        <level value="error" />
+    </logger>
+    <logger name="org.mule.routing.CollectionSplitter">
+        <level value="error" />
+    </logger>
+    <logger name="org.mule.routing.Foreach$CollectionMapSplitter">
+        <level value="error" />
+    </logger>
+ <!-- Keep mule from logging the exception because our logging API does it -->
+
+   <logger name="org.mule.exception.CatchMessagingExceptionStrategy">
+
+        <level value="off"/>
+
+    </logger>
+
+
+    <!-- Default EAI logging -->
+    <logger name="com.ca.eai.esb">
+        <level value="info" />
+    </logger>
+
+    <logger name="com.ca.eai.esb.stdlog">
+        <level value="info" />
+    </logger>
+
+    <logger name="com.ca.eai.esb.stdlog.debugging">
+        <level value="debug" />
+    </logger>
+
+    <logger name="com.ca.eai.esb.stdlog.debugging.authorization">
+        <level value="info" />
+    </logger>
+    <logger name="com.ca.eai.esb.stdlog.debugging.throttle">
+        <level value="info" />
+    </logger>
+
+    <!-- Adjust this to debug to see the request message body -->
+    <logger name="com.ca.eai.esb.client.request">
+        <level value="info" />
+    </logger>
+    <!-- Adjust this to debug to see the response message body -->
+    <logger name="com.ca.eai.esb.client.response">
+        <level value="info" />
+    </logger>
+    <!-- turn off datamapper verboseness -->
+    <logger name="org.jetel">
+        <level value="WARN" />
+    </logger>
+    <logger name="Tracking">
+        <level value="WARN" />
+    </logger>
+    <logger name="com.mulesoft.module.datamapper">
+        <level value="warn" />
+    </logger>
+    <logger name="com.mulesoft.datamapper">
+        <level value="warn" />
+    </logger>
+    <logger name="Tracking">
+        <level value="warn" />
+    </logger>
+    <logger name="org.jetel.graph">
+        <level value="warn" />
+    </logger>
+
+    <root>
+        <!--level value="info"/ -->
+        <priority value="info" />
+        <appender-ref ref="rollingFile" />
+        <!--  commented out to stop console (mule.log) logging
+        <appender-ref ref="quietinfo" />
+        -->
+        <appender-ref ref="pingLog" />
+    </root>
+</log4j:configuration>
