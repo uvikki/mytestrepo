@@ -9,6 +9,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
     <http:listener-config name="HTTP_Listener_Configuration" host="localhost" port="8081" basePath="testing" doc:name="HTTP Listener Configuration"/>
     <flow name="sampleFlow">
         <http:listener config-ref="HTTP_Listener_Configuration" path="/" doc:name="HTTP"/>
+        <logger message="flow started and payload is #[payload.toString()]" level="INFO" doc:name="Logger"/>
         <object-to-string-transformer doc:name="Object to String"/>
         <logger message="flow started and payload is #[payload.toString()]" level="INFO" doc:name="Logger"/>
          
